@@ -1,0 +1,92 @@
+{
+  "name": "ado-todo-sync",
+  "displayName": "ADO Todo Sync",
+  "description": "Capture todos in your repo and sync them to Azure DevOps. Delegate work to Claude Code, Copilot, or ADO Copilot agents.",
+  "version": "0.1.0",
+  "publisher": "moizmh",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Other"],
+  "main": "./out/extension.js",
+  "activationEvents": [
+    "onView:adoTodos.todoTree",
+    "workspaceContains:.ado/todos.json"
+  ],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "adoTodos",
+          "title": "ADO Todos",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "adoTodos": [
+        {
+          "id": "adoTodos.todoTree",
+          "name": "Todos"
+        }
+      ]
+    },
+    "commands": [
+      { "command": "adoTodos.add", "title": "ADO Todos: Add Todo", "icon": "$(add)" },
+      { "command": "adoTodos.sync", "title": "ADO Todos: Sync to Azure DevOps", "icon": "$(cloud-upload)" },
+      { "command": "adoTodos.refresh", "title": "ADO Todos: Refresh", "icon": "$(refresh)" },
+      { "command": "adoTodos.edit", "title": "Edit", "icon": "$(edit)" },
+      { "command": "adoTodos.delete", "title": "Delete", "icon": "$(trash)" },
+      { "command": "adoTodos.runAgent", "title": "Run with Agent…", "icon": "$(play)" },
+      { "command": "adoTodos.openMetrics", "title": "ADO Todos: Open Metrics Dashboard", "icon": "$(graph)" },
+      { "command": "adoTodos.configure", "title": "ADO Todos: Configure" },
+      { "command": "adoTodos.setPat", "title": "ADO Todos: Set Personal Access Token" }
+    ],
+    "menus": {
+      "view/title": [
+        { "command": "adoTodos.add", "when": "view == adoTodos.todoTree", "group": "navigation@1" },
+        { "command": "adoTodos.sync", "when": "view == adoTodos.todoTree", "group": "navigation@2" },
+        { "command": "adoTodos.openMetrics", "when": "view == adoTodos.todoTree", "group": "navigation@3" },
+        { "command": "adoTodos.refresh", "when": "view == adoTodos.todoTree", "group": "navigation@4" }
+      ],
+      "view/item/context": [
+        { "command": "adoTodos.runAgent", "when": "view == adoTodos.todoTree && viewItem == todo", "group": "inline@1" },
+        { "command": "adoTodos.edit", "when": "view == adoTodos.todoTree && viewItem == todo", "group": "inline@2" },
+        { "command": "adoTodos.delete", "when": "view == adoTodos.todoTree && viewItem == todo", "group": "inline@3" }
+      ]
+    },
+    "configuration": {
+      "title": "ADO Todo Sync",
+      "properties": {
+        "adoTodos.defaultAgent": {
+          "type": "string",
+          "enum": ["claude-code", "copilot", "ado-copilot"],
+          "default": "claude-code",
+          "description": "Default agent to run when 'Run with Agent' has no explicit choice."
+        },
+        "adoTodos.claudeCodeCommand": {
+          "type": "string",
+          "default": "claude",
+          "description": "Command used to invoke Claude Code CLI."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package"
+  },
+  "dependencies": {
+    "azure-devops-node-api": "^14.0.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/uuid": "^9.0.8",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.2.1",
+    "typescript": "^5.4.5"
+  }
+}
