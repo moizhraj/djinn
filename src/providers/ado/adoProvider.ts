@@ -13,9 +13,13 @@ export class AdoProvider implements IssueProvider {
   private connection?: azdev.WebApi;
 
   constructor(private cfg: WorkspaceConfig, private secrets: vscode.SecretStorage) {
-    if (!cfg.orgUrl || !cfg.project) {
-      throw new Error('ADO provider requires orgUrl and project in workspace config.');
+    if (!cfg.orgUrl || !cfg.project || !cfg.team) {
+      throw new Error('ADO provider requires orgUrl, project, and team in workspace config.');
     }
+  }
+
+  private effectiveAreaPath(): string {
+    return this.cfg.areaPath ?? `${this.cfg.project}\\${this.cfg.team}`;
   }
 
   async ensureAuth(): Promise<boolean> {
@@ -32,7 +36,7 @@ export class AdoProvider implements IssueProvider {
       { op: 'add', path: '/fields/System.Title', value: input.title }
     ];
     if (input.description) ops.push({ op: 'add', path: '/fields/System.Description', value: input.description });
-    if (this.cfg.areaPath) ops.push({ op: 'add', path: '/fields/System.AreaPath', value: this.cfg.areaPath });
+    ops.push({ op: 'add', path: '/fields/System.AreaPath', value: this.effectiveAreaPath() });
     if (this.cfg.iterationPath) ops.push({ op: 'add', path: '/fields/System.IterationPath', value: this.cfg.iterationPath });
     if (input.effort?.total != null) ops.push({ op: 'add', path: '/fields/Microsoft.VSTS.Scheduling.OriginalEstimate', value: input.effort.total });
     if (input.effort?.remaining != null) ops.push({ op: 'add', path: '/fields/Microsoft.VSTS.Scheduling.RemainingWork', value: input.effort.remaining });

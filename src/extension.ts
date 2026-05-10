@@ -17,8 +17,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   if (!folder) {
     // Still register an empty tree so VS Code doesn't show "no provider".
     const empty: vscode.TreeDataProvider<never> = { getTreeItem: () => new vscode.TreeItem(''), getChildren: () => [] };
-    context.subscriptions.push(vscode.window.createTreeView('anvil.todoTree', { treeDataProvider: empty }));
-    vscode.window.showWarningMessage('Anvil: open a folder to use this extension.');
+    context.subscriptions.push(vscode.window.createTreeView('djinn.todoTree', { treeDataProvider: empty }));
+    vscode.window.showWarningMessage('Djinn: open a folder to use this extension.');
     return;
   }
   const root = folder.uri;
@@ -32,12 +32,12 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
   // ── Register UI + commands SYNCHRONOUSLY so the view always binds ──
   const treeProvider = new TodoTreeProvider(todos);
-  const treeView = vscode.window.createTreeView('anvil.todoTree', { treeDataProvider: treeProvider });
+  const treeView = vscode.window.createTreeView('djinn.todoTree', { treeDataProvider: treeProvider });
 
   const version = context.extension.packageJSON.version as string;
   const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
-  statusBar.command = 'anvil.configure';
-  statusBar.text = `$(checklist) Anvil (${version})`;
+  statusBar.command = 'djinn.configure';
+  statusBar.text = `$(checklist) Djinn (${version})`;
   statusBar.tooltip = 'Click to configure a sync provider.';
   statusBar.show();
 
@@ -45,7 +45,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     try {
       const cfg = await cfgStore.load();
       if (cfg) {
-        statusBar.text = `$(checklist) Anvil: ${cfg.provider} (${version})`;
+        statusBar.text = `$(checklist) Djinn: ${cfg.provider} (${version})`;
         statusBar.tooltip = `Provider: ${cfg.provider}. Click to reconfigure.`;
       }
     } catch {
@@ -67,9 +67,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     treeView,
     statusBar,
 
-    vscode.commands.registerCommand('anvil.refresh', () => treeProvider.refresh()),
+    vscode.commands.registerCommand('djinn.refresh', () => treeProvider.refresh()),
 
-    vscode.commands.registerCommand('anvil.add', async () => {
+    vscode.commands.registerCommand('djinn.add', async () => {
       try {
         const title = await vscode.window.showInputBox({ prompt: 'Todo title', ignoreFocusOut: true });
         if (!title) return;
@@ -89,19 +89,19 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       }
     }),
 
-    vscode.commands.registerCommand('anvil.edit', async (arg: TodoTreeItem | string | undefined) => {
+    vscode.commands.registerCommand('djinn.edit', async (arg: TodoTreeItem | string | undefined) => {
       const id = typeof arg === 'string' ? arg : arg?.todo.id;
       if (!id) return;
-      TodoEditorPanel.show(todos, agents, id);
+      TodoEditorPanel.show(todos, agents, id, estimator);
     }),
 
-    vscode.commands.registerCommand('anvil.delete', async (item: TodoTreeItem) => {
+    vscode.commands.registerCommand('djinn.delete', async (item: TodoTreeItem) => {
       if (!item) return;
       const yes = await vscode.window.showWarningMessage(`Delete "${item.todo.title}"?`, { modal: true }, 'Delete');
       if (yes === 'Delete') await todos.remove(item.todo.id);
     }),
 
-    vscode.commands.registerCommand('anvil.sync', async () => {
+    vscode.commands.registerCommand('djinn.sync', async () => {
       await vscode.window.withProgress(
         { location: vscode.ProgressLocation.Notification, title: 'Syncing todos…' },
         async () => {
@@ -122,7 +122,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       );
     }),
 
-    vscode.commands.registerCommand('anvil.runAgent', async (item: TodoTreeItem) => {
+    vscode.commands.registerCommand('djinn.runAgent', async (item: TodoTreeItem) => {
       if (!item) return;
       const available = await agents.listAvailable();
       if (available.length === 0) {
@@ -147,22 +147,30 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       }
     }),
 
-    vscode.commands.registerCommand('anvil.openMetrics', async () => {
+    vscode.commands.registerCommand('djinn.openMetrics', async () => {
       await MetricsPanel.show(metrics, todos);
     }),
 
-    vscode.commands.registerCommand('anvil.configure', async () => {
+    vscode.commands.registerCommand('djinn.configure', async () => {
       try {
         const existing = await cfgStore.load();
         if (existing) {
+          const options = existing.provider === 'ado'
+            ? ['Keep current settings', 'Reconfigure ADO settings', 'Switch provider']
+            : ['Keep current provider', 'Switch provider'];
           const reset = await vscode.window.showQuickPick(
-            ['Keep current provider', 'Switch provider'],
+            options,
             { placeHolder: `Current provider: ${existing.provider}` }
           );
+          if (!reset) return;
           if (reset === 'Switch provider') {
             const { provider: _p, ...rest } = existing;
             void _p;
             await cfgStore.save(rest as never);
+          } else if (reset === 'Reconfigure ADO settings') {
+            const { orgUrl: _o, project: _proj, team: _t, areaPath: _a, iterationPath: _i, ...rest } = existing;
+            void _o; void _proj; void _t; void _a; void _i;
+            await cfgStore.save({ ...rest, provider: 'ado' });
           }
         }
         const cfg = await cfgStore.ensure();
@@ -185,24 +193,24 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     try {
       await migrate(root);
     } catch (e) {
-      console.warn('Anvil migration failed:', e);
+      console.warn('Djinn migration failed:', e);
     }
     try {
       await todos.init();
     } catch (e) {
-      console.warn('Anvil todoStore init failed:', e);
+      console.warn('Djinn todoStore init failed:', e);
     }
     try {
       await metrics.load();
     } catch (e) {
-      console.warn('Anvil metricsStore load failed:', e);
+      console.warn('Djinn metricsStore load failed:', e);
     }
 
     let detected;
     try {
       detected = await cfgStore.detect();
     } catch (e) {
-      console.warn('Anvil provider detection failed:', e);
+      console.warn('Djinn provider detection failed:', e);
     }
     await refreshStatusBar();
     await updateViewTitle();
@@ -214,7 +222,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         try {
           provider = createProvider(detected, context.secrets);
         } catch (e) {
-          console.warn('Anvil createProvider failed:', e);
+          console.warn('Djinn createProvider failed:', e);
           return;
         }
         void context.workspaceState.update(connectKey, true);

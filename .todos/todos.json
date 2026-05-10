@@ -275,15 +275,326 @@
     {
       "id": "d4494606-dde4-4426-96e0-35e6f40d8118",
       "title": "Imporve the agent metrics dashboard",
-      "status": "draft",
+      "status": "done",
       "createdAt": "2026-05-10T00:51:32.076Z",
-      "updatedAt": "2026-05-10T00:51:42.507Z",
+      "updatedAt": "2026-05-10T00:56:53.848Z",
       "effort": {
         "total": 8,
-        "remaining": 8,
-        "completed": 0
+        "remaining": 0,
+        "completed": 8
       },
-      "effortCounted": true
+      "effortCounted": true,
+      "description": "I would like to imporove on the agent metrics dashboard. It should look beautiful in first place. It should show a time chart on how many tasks users created, worked on, completed, failed, hours of usage, changes added/updated. Also another chart, like heat map that github has with same color coding. ",
+      "agentOptions": {
+        "selected": "claude-code",
+        "byAgent": {
+          "claude-code": {
+            "model": "claude-opus-4-7",
+            "reasoning": "ultrathink",
+            "approvals": "acceptEdits"
+          },
+          "copilot": {
+            "mode": "agent"
+          }
+        }
+      },
+      "agent": {
+        "type": "claude-code",
+        "lastRunAt": "2026-05-10T00:54:06.831Z",
+        "lastOutputSnippet": "Workspace: ado-extension\nPath: c:\\Source\\ado-extension\nTop-level dirs: media, out, scripts, src\nManifests: package.json\nREADME excerpt:\n# Anvil\n\nCapture todos in your repo and sync them to Azure DevOps, GitHub, or GitLab. Delegate work to\nClaude Code, GitHub Copilot, or ADO Copilot agents and track progress and\neffort metrics in VS Code.\n\nTask: Imporve the agent metrics dashboard\nDetails: I would like to imporove on the agent metrics dashboard. It should look beautiful in first place. It should "
+      },
+      "tokensUsed": 0,
+      "completionCounted": true,
+      "agentDurationMs": 167016,
+      "completedAt": "2026-05-10T00:56:53.848Z"
+    },
+    {
+      "id": "65c23a7e-0724-4b8a-8753-01dc05917561",
+      "title": "Rename the extension to Djinn",
+      "status": "done",
+      "createdAt": "2026-05-10T00:56:02.773Z",
+      "updatedAt": "2026-05-10T01:00:53.808Z",
+      "effort": {
+        "total": 4,
+        "remaining": 0,
+        "completed": 4
+      },
+      "effortCounted": true,
+      "description": "Rename the extension to Djinn and add appropriate extension icon.",
+      "agentOptions": {
+        "selected": "claude-code",
+        "byAgent": {
+          "claude-code": {
+            "model": "claude-sonnet-4-6",
+            "reasoning": "think",
+            "approvals": "acceptEdits"
+          },
+          "copilot": {
+            "mode": "agent"
+          }
+        }
+      },
+      "agent": {
+        "type": "claude-code",
+        "lastRunAt": "2026-05-10T00:56:50.790Z",
+        "lastOutputSnippet": "Workspace: ado-extension\nPath: c:\\Source\\ado-extension\nTop-level dirs: media, out, scripts, src\nManifests: package.json\nREADME excerpt:\n# Anvil\n\nCapture todos in your repo and sync them to Azure DevOps, GitHub, or GitLab. Delegate work to\nClaude Code, GitHub Copilot, or ADO Copilot agents and track progress and\neffort metrics in VS Code.\n\nTask: Rename the extension to Djinn\nDetails: Rename the extension to Djinn and add appropriate extension icon.\nthink"
+      },
+      "tokensUsed": 0,
+      "completionCounted": true,
+      "agentDurationMs": 243018,
+      "completedAt": "2026-05-10T01:00:53.808Z"
+    },
+    {
+      "id": "100f0ae0-0f30-4e13-9b9f-d0689d92b15e",
+      "title": "Metrics dashboard update",
+      "status": "done",
+      "createdAt": "2026-05-10T01:04:38.935Z",
+      "updatedAt": "2026-05-10T01:12:56.920Z",
+      "effort": {
+        "total": 4,
+        "remaining": 0,
+        "completed": 4
+      },
+      "effortCounted": true,
+      "description": "More updates needed on the metrics dashboard:\n- The metrics dashboard should also show the total time it took the agent to complete overall.\n- The heatmap should show white squares for empty slots instead of black with gray border, and make the overall heatmap a little smaller.\n- The heatmap should be monthly and should allow user to navigate for last 12 months. \n- Tasks created shows 0 on its card while completed shows 8. \n- The hours saved should reflect based on agent completed time. ",
+      "agentOptions": {
+        "selected": "claude-code",
+        "byAgent": {
+          "claude-code": {
+            "model": "claude-opus-4-7",
+            "reasoning": "ultrathink",
+            "approvals": "acceptEdits"
+          },
+          "copilot": {
+            "mode": "agent"
+          }
+        }
+      },
+      "agent": {
+        "type": "claude-code",
+        "lastRunAt": "2026-05-10T01:09:36.722Z",
+        "lastOutputSnippet": "Workspace: ado-extension\nPath: c:\\Source\\ado-extension\nTop-level dirs: media, out, scripts, src\nManifests: package.json\nREADME excerpt:\n# Anvil\n\nCapture todos in your repo and sync them to Azure DevOps, GitHub, or GitLab. Delegate work to\nClaude Code, GitHub Copilot, or ADO Copilot agents and track progress and\neffort metrics in VS Code.\n\nTask: Metrics dashboard update\nDetails: More updates needed on the metrics dashboard:\n- The metrics dashboard should also show the total time it took the agent"
+      },
+      "tokensUsed": 0,
+      "completionCounted": true,
+      "agentDurationMs": 200198,
+      "completedAt": "2026-05-10T01:12:56.920Z"
+    },
+    {
+      "id": "c23de28c-ca98-471b-b271-9bc04aae46d7",
+      "title": "Metrics dashboard update",
+      "status": "done",
+      "createdAt": "2026-05-10T01:22:01.159Z",
+      "updatedAt": "2026-05-10T01:26:47.374Z",
+      "effort": {
+        "total": 2,
+        "remaining": 0,
+        "completed": 2
+      },
+      "effortCounted": true,
+      "description": "- The at a glance section should show 1 card for Tasks Created and Tasks Completed like 8/8.\n- Agent specifics should also be in one card so combine Agent runs, Agent runtime, Hours completed, tokens used\n- Last card for Hours saved.",
+      "agentOptions": {
+        "selected": "claude-code",
+        "byAgent": {
+          "claude-code": {
+            "model": "claude-sonnet-4-6",
+            "reasoning": "think",
+            "approvals": "acceptEdits"
+          },
+          "copilot": {
+            "mode": "agent"
+          }
+        }
+      },
+      "agent": {
+        "type": "claude-code",
+        "lastRunAt": "2026-05-10T01:25:43.302Z",
+        "lastOutputSnippet": "Workspace: ado-extension\nPath: c:\\Source\\ado-extension\nTop-level dirs: media, out, scripts, src\nManifests: package.json\nREADME excerpt:\n# Anvil\n\nCapture todos in your repo and sync them to Azure DevOps, GitHub, or GitLab. Delegate work to\nClaude Code, GitHub Copilot, or ADO Copilot agents and track progress and\neffort metrics in VS Code.\n\nTask: Metrics dashboard update\nDetails: - The at a glance section should show 1 card for Tasks Created and Tasks Completed like 8/8.\n- Agent specifics should a"
+      },
+      "tokensUsed": 317,
+      "completionCounted": true,
+      "agentDurationMs": 64072,
+      "completedAt": "2026-05-10T01:26:47.374Z"
+    },
+    {
+      "id": "15711266-8868-4efa-9507-80f0b7c088f9",
+      "title": "Task efforts updates",
+      "status": "done",
+      "createdAt": "2026-05-10T01:28:43.519Z",
+      "updatedAt": "2026-05-10T01:34:17.725Z",
+      "effort": {
+        "total": 2,
+        "remaining": 0,
+        "completed": 2
+      },
+      "effortCounted": true,
+      "description": "The task efforts updates should happen on every save for title or description field and not the other fields. The description should give more context so based on this the extension shold decide with the help of agent that how much efforts it will take for a human to work with agents to complete it. It should consider factors like adding a task, description, running the agent to work on the task, doing the validation after the task is completed and determine the total efforts. \n\nAlso remove the remaining and completed as its not really of any use. ",
+      "agentOptions": {
+        "selected": "claude-code",
+        "byAgent": {
+          "claude-code": {
+            "model": "claude-sonnet-4-6",
+            "reasoning": "think",
+            "approvals": "acceptEdits"
+          },
+          "copilot": {
+            "mode": "agent"
+          }
+        }
+      },
+      "agent": {
+        "type": "claude-code",
+        "lastRunAt": "2026-05-10T01:31:57.117Z",
+        "lastOutputSnippet": "Workspace: ado-extension\nPath: c:\\Source\\ado-extension\nTop-level dirs: media, out, scripts, src\nManifests: package.json\nREADME excerpt:\n# Anvil\n\nCapture todos in your repo and sync them to Azure DevOps, GitHub, or GitLab. Delegate work to\nClaude Code, GitHub Copilot, or ADO Copilot agents and track progress and\neffort metrics in VS Code.\n\nTask: Task efforts updates\nDetails: The task efforts updates should happen on every save for title or description field and not the other fields. The descripti"
+      },
+      "tokensUsed": 461,
+      "completionCounted": true,
+      "agentDurationMs": 140608,
+      "completedAt": "2026-05-10T01:34:17.725Z"
+    },
+    {
+      "id": "d2b3d357-019f-4f01-aef7-825b2009336b",
+      "title": "Combine tasks created  and hours saved in one card",
+      "status": "done",
+      "createdAt": "2026-05-10T01:40:15.911Z",
+      "updatedAt": "2026-05-10T01:44:36.724Z",
+      "effort": {
+        "total": 0.8,
+        "remaining": 0,
+        "completed": 0.8
+      },
+      "effortCounted": true,
+      "description": "In metrics dashbaord, Combine tasks created  and hours saved in one card.\nAlso fix one bug related to heatmap. When you hover over the heatmap on the edge boxes, it shows horizontal and vertical scrollbar, this should not happen.\nAlso the changes added vs updated is not showing correct number",
+      "agentOptions": {
+        "selected": "claude-code",
+        "byAgent": {
+          "claude-code": {
+            "model": "claude-sonnet-4-6",
+            "reasoning": "none",
+            "approvals": "acceptEdits"
+          },
+          "copilot": {
+            "mode": "agent"
+          }
+        }
+      },
+      "agent": {
+        "type": "claude-code",
+        "lastRunAt": "2026-05-10T01:42:47.151Z",
+        "lastOutputSnippet": "Workspace: ado-extension\nPath: c:\\Source\\ado-extension\nTop-level dirs: media, out, scripts, src\nManifests: package.json\nREADME excerpt:\n# Anvil\n\nCapture todos in your repo and sync them to Azure DevOps, GitHub, or GitLab. Delegate work to\nClaude Code, GitHub Copilot, or ADO Copilot agents and track progress and\neffort metrics in VS Code.\n\nTask: Combine tasks created  and hours saved in one card\nDetails: In metrics dashbaord, Combine tasks created  and hours saved in one card.\nAlso fix one bug re"
+      },
+      "tokensUsed": 690,
+      "completionCounted": true,
+      "agentDurationMs": 109573,
+      "completedAt": "2026-05-10T01:44:36.724Z"
+    },
+    {
+      "id": "29c8a48c-1907-4043-9de6-10a94d40cf4a",
+      "title": "For ADO based tasks sync, it should require users to provide specific information to sync to correct ADO path",
+      "status": "done",
+      "createdAt": "2026-05-10T01:43:12.350Z",
+      "updatedAt": "2026-05-10T01:50:05.090Z",
+      "effort": {
+        "total": 1.5,
+        "remaining": 0,
+        "completed": 1.5
+      },
+      "effortCounted": true,
+      "description": "For ADO based tasks sync, it should require users to provide specific information to sync to correct ADO path like org and team. The extension should allow the users to set these up. ",
+      "agentOptions": {
+        "selected": "claude-code",
+        "byAgent": {
+          "claude-code": {
+            "model": "claude-sonnet-4-6",
+            "reasoning": "none",
+            "approvals": "acceptEdits"
+          },
+          "copilot": {
+            "mode": "agent"
+          }
+        }
+      },
+      "agent": {
+        "type": "claude-code",
+        "lastRunAt": "2026-05-10T01:46:21.868Z",
+        "lastOutputSnippet": "Workspace: ado-extension\nPath: c:\\Source\\ado-extension\nTop-level dirs: media, out, scripts, src\nManifests: package.json\nREADME excerpt:\n# Anvil\n\nCapture todos in your repo and sync them to Azure DevOps, GitHub, or GitLab. Delegate work to\nClaude Code, GitHub Copilot, or ADO Copilot agents and track progress and\neffort metrics in VS Code.\n\nTask: For ADO based tasks sync, it should require users to provide specific information to sync to correct ADO path\nDetails: For ADO based tasks sync, it shoul"
+      },
+      "tokensUsed": 0,
+      "completionCounted": true,
+      "agentDurationMs": 223222,
+      "completedAt": "2026-05-10T01:50:05.090Z"
+    },
+    {
+      "id": "ce3dba9b-f2e1-4f3e-9724-1687a2a51bd8",
+      "title": "Metrics Dashboard - Update at a glance section",
+      "status": "done",
+      "createdAt": "2026-05-10T01:54:10.577Z",
+      "updatedAt": "2026-05-10T01:59:56.557Z",
+      "effort": {
+        "total": 1.5,
+        "remaining": 0,
+        "completed": 1.5
+      },
+      "effortCounted": true,
+      "description": "The at a glance section is very bland. \n- The created/completed should be one field. and hours saved should be beneath it. It should increase the font and show it creativley instead of just showing text and numbers in that card. \n- Same goes for agent activity, it needs to be updated on the design front and not just show label and number. Lets be creative here. ",
+      "agentOptions": {
+        "selected": "claude-code",
+        "byAgent": {
+          "claude-code": {
+            "model": "claude-opus-4-7",
+            "reasoning": "ultrathink",
+            "approvals": "acceptEdits"
+          },
+          "copilot": {
+            "mode": "agent"
+          }
+        }
+      },
+      "agent": {
+        "type": "claude-code",
+        "lastRunAt": "2026-05-10T01:57:25.757Z",
+        "lastOutputSnippet": "Workspace: ado-extension\nPath: c:\\Source\\ado-extension\nTop-level dirs: media, out, scripts, src\nManifests: package.json\nREADME excerpt:\n# Anvil\n\nCapture todos in your repo and sync them to Azure DevOps, GitHub, or GitLab. Delegate work to\nClaude Code, GitHub Copilot, or ADO Copilot agents and track progress and\neffort metrics in VS Code.\n\nTask: Metrics Dashboard - Update at a glance section\nDetails: The at a glance section is very bland. \n- The created/completed should be one field. and hours sa"
+      },
+      "tokensUsed": 414,
+      "completionCounted": true,
+      "agentDurationMs": 150800,
+      "completedAt": "2026-05-10T01:59:56.557Z"
+    },
+    {
+      "id": "05326ca9-5f3f-4496-a55b-6c4690497f0a",
+      "title": "Update editing item layout",
+      "status": "done",
+      "createdAt": "2026-05-10T01:58:22.219Z",
+      "updatedAt": "2026-05-10T02:08:30.182Z",
+      "effort": {
+        "total": 1.5,
+        "remaining": 0,
+        "completed": 1.5
+      },
+      "effortCounted": true,
+      "description": "The edit panel for a todo item is very bland in design. It needs to be improved\n- Improve the design\n- Show a colorful progress icon\n- Show save, run buttons ton top with icons.\n- utilize the agent related fields all in one line instead of using one control on each line. \n- Provide a usage symbol after estimation that suggests weather it requires high reasoning or low reasoning.\n- if the task is completed, the status should be colorful. ",
+      "agentOptions": {
+        "selected": "claude-code",
+        "byAgent": {
+          "claude-code": {
+            "model": "claude-sonnet-4-6",
+            "reasoning": "none",
+            "approvals": "default"
+          },
+          "copilot": {
+            "mode": "agent"
+          }
+        }
+      },
+      "agent": {
+        "type": "claude-code",
+        "lastRunAt": "2026-05-10T02:04:59.277Z",
+        "lastOutputSnippet": "Workspace: ado-extension\nPath: c:\\Source\\ado-extension\nTop-level dirs: media, out, scripts, src\nManifests: package.json\nREADME excerpt:\n# Anvil\n\nCapture todos in your repo and sync them to Azure DevOps, GitHub, or GitLab. Delegate work to\nClaude Code, GitHub Copilot, or ADO Copilot agents and track progress and\neffort metrics in VS Code.\n\nTask: Update editing item layout\nDetails: The edit panel for a todo item is very bland in design. It needs to be improved\n- Improve the design\n- Show a colorfu"
+      },
+      "tokensUsed": 0,
+      "completionCounted": true,
+      "agentDurationMs": 210905,
+      "completedAt": "2026-05-10T02:08:30.182Z"
     }
   ]
 }

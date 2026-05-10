@@ -1,17 +1,17 @@
 import * as vscode from 'vscode';
 
-const HOOK_MARKER = 'ANVIL_DONE_FILE';
+const HOOK_MARKER = 'DJINN_DONE_FILE';
 const HOOK_COMMAND =
-  'node -e "var f=process.env.ANVIL_DONE_FILE;if(f){var fs=require(\'fs\'),p=require(\'path\');fs.mkdirSync(p.dirname(f),{recursive:true});fs.closeSync(fs.openSync(f,\'a\'))}"';
+  'node -e "var f=process.env.DJINN_DONE_FILE;if(f){var fs=require(\'fs\'),p=require(\'path\');fs.mkdirSync(p.dirname(f),{recursive:true});fs.closeSync(fs.openSync(f,\'a\'))}"';
 
 /**
  * Ensures the project's `.claude/settings.json` has a Stop hook that touches
- * the file at $ANVIL_DONE_FILE. The hook is a no-op when the env var is
+ * the file at $DJINN_DONE_FILE. The hook is a no-op when the env var is
  * absent, so it doesn't affect users running `claude` outside the extension.
- * Idempotent — re-runs detect the existing entry by its $ANVIL_DONE_FILE
+ * Idempotent — re-runs detect the existing entry by its $DJINN_DONE_FILE
  * reference and leave the file alone.
  */
-export async function ensureAnvilStopHook(workspaceRoot: vscode.Uri): Promise<void> {
+export async function ensureDjinnStopHook(workspaceRoot: vscode.Uri): Promise<void> {
   const settingsUri = vscode.Uri.joinPath(workspaceRoot, '.claude', 'settings.json');
   let json: Record<string, unknown> = {};
   try {
@@ -39,5 +39,5 @@ export async function ensureAnvilStopHook(workspaceRoot: vscode.Uri): Promise<vo
 }
 
 export function sentinelUri(workspaceRoot: vscode.Uri, runId: string): vscode.Uri {
-  return vscode.Uri.joinPath(workspaceRoot, '.anvil', 'completion', `${runId}.done`);
+  return vscode.Uri.joinPath(workspaceRoot, '.djinn', 'completion', `${runId}.done`);
 }

@@ -1,8 +1,8 @@
 {
-  "name": "anvil",
-  "displayName": "Anvil",
+  "name": "djinn",
+  "displayName": "Djinn",
   "description": "Capture todos in your repo and sync them to Azure DevOps, GitHub, or GitLab. Delegate work to Claude Code or Copilot agents.",
-  "version": "0.3.4",
+  "version": "0.3.12",
   "publisher": "moizmh",
   "engines": {
     "vscode": "^1.93.0"
@@ -10,7 +10,7 @@
   "categories": ["Other"],
   "main": "./out/extension.js",
   "activationEvents": [
-    "onView:anvil.todoTree",
+    "onView:djinn.todoTree",
     "workspaceContains:.todos/todos.json",
     "workspaceContains:.ado/todos.json"
   ],
@@ -18,81 +18,81 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "anvil",
-          "title": "Anvil",
+          "id": "djinn",
+          "title": "Djinn",
           "icon": "media/icon.svg"
         }
       ]
     },
     "views": {
-      "anvil": [
+      "djinn": [
         {
-          "id": "anvil.todoTree",
+          "id": "djinn.todoTree",
           "name": "Todos"
         }
       ]
     },
     "commands": [
-      { "command": "anvil.add", "title": "Anvil: Add Todo", "icon": "$(add)" },
-      { "command": "anvil.sync", "title": "Anvil: Sync", "icon": "$(cloud-upload)" },
-      { "command": "anvil.refresh", "title": "Anvil: Refresh", "icon": "$(refresh)" },
-      { "command": "anvil.edit", "title": "Edit", "icon": "$(edit)" },
-      { "command": "anvil.delete", "title": "Delete", "icon": "$(trash)" },
-      { "command": "anvil.runAgent", "title": "Run with Agent…", "icon": "$(play)" },
-      { "command": "anvil.openMetrics", "title": "Anvil: Open Metrics Dashboard", "icon": "$(graph)" },
-      { "command": "anvil.configure", "title": "Anvil: Configure Provider" }
+      { "command": "djinn.add", "title": "Djinn: Add Todo", "icon": "$(add)" },
+      { "command": "djinn.sync", "title": "Djinn: Sync", "icon": "$(cloud-upload)" },
+      { "command": "djinn.refresh", "title": "Djinn: Refresh", "icon": "$(refresh)" },
+      { "command": "djinn.edit", "title": "Edit", "icon": "$(edit)" },
+      { "command": "djinn.delete", "title": "Delete", "icon": "$(trash)" },
+      { "command": "djinn.runAgent", "title": "Run with Agent…", "icon": "$(play)" },
+      { "command": "djinn.openMetrics", "title": "Djinn: Open Metrics Dashboard", "icon": "$(graph)" },
+      { "command": "djinn.configure", "title": "Djinn: Configure Provider" }
     ],
     "menus": {
       "view/title": [
-        { "command": "anvil.add", "when": "view == anvil.todoTree", "group": "navigation@1" },
-        { "command": "anvil.sync", "when": "view == anvil.todoTree", "group": "navigation@2" },
-        { "command": "anvil.openMetrics", "when": "view == anvil.todoTree", "group": "navigation@3" },
-        { "command": "anvil.refresh", "when": "view == anvil.todoTree", "group": "navigation@4" }
+        { "command": "djinn.add", "when": "view == djinn.todoTree", "group": "navigation@1" },
+        { "command": "djinn.sync", "when": "view == djinn.todoTree", "group": "navigation@2" },
+        { "command": "djinn.openMetrics", "when": "view == djinn.todoTree", "group": "navigation@3" },
+        { "command": "djinn.refresh", "when": "view == djinn.todoTree", "group": "navigation@4" }
       ],
       "view/item/context": [
-        { "command": "anvil.runAgent", "when": "view == anvil.todoTree && viewItem == todo", "group": "inline@1" },
-        { "command": "anvil.delete", "when": "view == anvil.todoTree && viewItem == todo", "group": "inline@2" }
+        { "command": "djinn.runAgent", "when": "view == djinn.todoTree && viewItem == todo", "group": "inline@1" },
+        { "command": "djinn.delete", "when": "view == djinn.todoTree && viewItem == todo", "group": "inline@2" }
       ]
     },
     "configuration": {
-      "title": "Anvil",
+      "title": "Djinn",
       "properties": {
-        "anvil.defaultAgent": {
+        "djinn.defaultAgent": {
           "type": "string",
           "enum": ["claude-code", "copilot", "open-issue"],
           "default": "claude-code",
           "description": "Default agent to run when 'Run with Agent' has no explicit choice."
         },
-        "anvil.claudeCodeCommand": {
+        "djinn.claudeCodeCommand": {
           "type": "string",
           "default": "claude",
           "description": "Command used to invoke Claude Code CLI."
         },
-        "anvil.claudeCode.model": {
+        "djinn.claudeCode.model": {
           "type": "string",
           "enum": ["sonnet", "opus", "haiku"],
           "default": "sonnet",
           "description": "Default model for Claude Code agent runs."
         },
-        "anvil.claudeCode.reasoning": {
+        "djinn.claudeCode.reasoning": {
           "type": "string",
           "enum": ["none", "think", "think-hard", "ultrathink"],
           "default": "none",
           "description": "Default reasoning intensity hint appended to Claude Code prompts."
         },
-        "anvil.claudeCode.approvals": {
+        "djinn.claudeCode.approvals": {
           "type": "string",
           "enum": ["default", "acceptEdits", "plan", "bypassPermissions"],
           "default": "default",
           "description": "Default --permission-mode for Claude Code."
         },
-        "anvil.copilot.mode": {
+        "djinn.copilot.mode": {
           "type": "string",
           "enum": ["agent", "edit", "ask"],
           "default": "agent",
           "description": "Default Copilot Chat mode slash-command."
         },
-        "anvil.copilot.model": {
+        "djinn.copilot.model": {
           "type": "string",
           "default": "",
           "description": "Optional model hint included in the Copilot prompt."

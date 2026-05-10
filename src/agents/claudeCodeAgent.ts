@@ -7,7 +7,7 @@ import { MetricsStore } from '../store/metricsStore';
 import { spawnAgentTerminal } from '../util/terminalCapture';
 import { buildWorkspaceContext } from './contextBuilder';
 import { markTodoCompleted } from '../store/completion';
-import { ensureAnvilStopHook, sentinelUri } from '../util/claudeStopHook';
+import { ensureDjinnStopHook, sentinelUri } from '../util/claudeStopHook';
 
 const MODEL_CHOICES = [
   { value: 'claude-sonnet-4-6', label: 'Claude Sonnet 4.6' },
@@ -40,7 +40,7 @@ export class ClaudeCodeAgent implements AgentAdapter {
   ) {}
 
   async isAvailable(): Promise<boolean> {
-    const cmd = vscode.workspace.getConfiguration('anvil').get<string>('claudeCodeCommand', 'claude');
+    const cmd = vscode.workspace.getConfiguration('djinn').get<string>('claudeCodeCommand', 'claude');
     return new Promise(resolve => {
       const which = process.platform === 'win32' ? `where ${cmd}` : `command -v ${cmd}`;
       exec(which, err => resolve(!err));
@@ -48,7 +48,7 @@ export class ClaudeCodeAgent implements AgentAdapter {
   }
 
   optionsSchema(): AgentOptionField[] {
-    const cfg = vscode.workspace.getConfiguration('anvil');
+    const cfg = vscode.workspace.getConfiguration('djinn');
     return [
       {
         key: 'model',
@@ -75,7 +75,7 @@ export class ClaudeCodeAgent implements AgentAdapter {
   }
 
   async run(todo: Todo, options?: Record<string, string>): Promise<void> {
-    const cmd = vscode.workspace.getConfiguration('anvil').get<string>('claudeCodeCommand', 'claude');
+    const cmd = vscode.workspace.getConfiguration('djinn').get<string>('claudeCodeCommand', 'claude');
     const opts = this.resolveOptions(options);
 
     const ctx = await buildWorkspaceContext(this.workspaceRoot);
@@ -104,18 +104,18 @@ export class ClaudeCodeAgent implements AgentAdapter {
     // Install the Stop-hook sentinel writer once per workspace. Each run
     // gets its own sentinel path so the first turn that completes marks the
     // task done — no need to wait for the user to exit the CLI session.
-    await ensureAnvilStopHook(this.workspaceRoot);
+    await ensureDjinnStopHook(this.workspaceRoot);
     const runId = `${todo.id}-${Date.now()}`;
     const sentinel = sentinelUri(this.workspaceRoot, runId);
     const watcher = vscode.workspace.createFileSystemWatcher(
-      new vscode.RelativePattern(this.workspaceRoot, `.anvil/completion/${runId}.done`)
+      new vscode.RelativePattern(this.workspaceRoot, `.djinn/completion/${runId}.done`)
     );
 
     const { done, getOutput } = spawnAgentTerminal(
       `Claude Code · ${todo.title}`,
       this.workspaceRoot,
       command,
-      { ANVIL_DONE_FILE: sentinel.fsPath }
+      { DJINN_DONE_FILE: sentinel.fsPath }
     );
 
     let settled = false;

@@ -11,7 +11,7 @@ export class TodoTreeItem extends vscode.TreeItem {
     this.contextValue = 'todo';
     this.iconPath = new vscode.ThemeIcon(iconForStatus(todo.status));
     this.command = {
-      command: 'anvil.edit',
+      command: 'djinn.edit',
       title: 'Edit',
       arguments: [this]
     };
@@ -49,7 +49,7 @@ function buildTooltip(t: Todo): string {
   const lines = [`**${t.title}**`, '', `Status: ${t.status}`];
   if (t.remoteId) lines.push(`${t.remoteProvider ?? 'remote'} #${t.remoteId}`);
   if (t.remoteUrl) lines.push(t.remoteUrl);
-  if (t.effort) lines.push(`Effort total/remaining/completed: ${t.effort.total ?? '?'} / ${t.effort.remaining ?? '?'} / ${t.effort.completed ?? '?'}`);
+  if (t.effort?.total != null) lines.push(`Effort: ${t.effort.total}h`);
   if (t.agent) lines.push(`Last agent: ${t.agent.type} @ ${t.agent.lastRunAt}`);
   lines.push(`Created: ${formatFullDate(t.createdAt)}`);
   if (t.completedAt) lines.push(`Completed: ${formatFullDate(t.completedAt)}`);

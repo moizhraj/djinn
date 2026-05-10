@@ -13,7 +13,7 @@ export class EffortEstimator {
   constructor(private workspaceRoot: vscode.Uri) {}
 
   async estimate(todo: Todo): Promise<number> {
-    const claudeCmd = vscode.workspace.getConfiguration('anvil').get<string>('claudeCodeCommand', 'claude');
+    const claudeCmd = vscode.workspace.getConfiguration('djinn').get<string>('claudeCodeCommand', 'claude');
     const viaAgent = await this.estimateWithClaudeCode(todo, claudeCmd);
     if (viaAgent != null) return viaAgent;
     return this.heuristic(todo);
@@ -21,7 +21,9 @@ export class EffortEstimator {
 
   private async estimateWithClaudeCode(todo: Todo, cmd: string): Promise<number | undefined> {
     const prompt = [
-      'You are estimating engineering effort. Reply with ONLY a number of hours (integer or one decimal). No units, no explanation.',
+      'You are estimating the total time a human engineer spends to complete a task with the help of an AI coding agent.',
+      'Account for the full workflow: (1) writing the task title and description, (2) initiating the agent run, (3) reviewing agent progress and providing guidance, (4) validating and testing the completed work.',
+      'Reply with ONLY a number of hours (integer or one decimal place). No units, no explanation.',
       `Title: ${todo.title}`,
       todo.description ? `Description: ${todo.description}` : ''
     ].filter(Boolean).join('\n');

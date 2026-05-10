@@ -68,6 +68,7 @@ export interface WorkspaceConfig {
   // ADO
   orgUrl?: string;
   project?: string;
+  team?: string;
   defaultWorkItemType?: string;
   areaPath?: string;
   iterationPath?: string;

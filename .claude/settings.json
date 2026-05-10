@@ -33,6 +33,15 @@
             "command": "node -e \"var f=process.env.ANVIL_DONE_FILE;if(f){var fs=require('fs'),p=require('path');fs.mkdirSync(p.dirname(f),{recursive:true});fs.closeSync(fs.openSync(f,'a'))}\""
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"var f=process.env.DJINN_DONE_FILE;if(f){var fs=require('fs'),p=require('path');fs.mkdirSync(p.dirname(f),{recursive:true});fs.closeSync(fs.openSync(f,'a'))}\""
+          }
+        ]
       }
     ]
   }

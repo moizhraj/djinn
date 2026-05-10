@@ -87,6 +87,9 @@ export class WorkspaceConfigStore {
       cfg.project = cfg.project ?? (detected?.kind === 'ado' ? detected.project : undefined)
         ?? (await vscode.window.showInputBox({ prompt: 'ADO project name', ignoreFocusOut: true }));
       if (!cfg.project) return undefined;
+      cfg.team = cfg.team
+        ?? (await vscode.window.showInputBox({ prompt: 'ADO team name', placeHolder: 'e.g. My Team', ignoreFocusOut: true }));
+      if (!cfg.team) return undefined;
       cfg.defaultWorkItemType = cfg.defaultWorkItemType ?? 'Task';
     } else if (provider === 'github') {
       cfg.owner = cfg.owner ?? (detected?.kind === 'github' ? detected.owner : undefined)
@@ -109,7 +112,7 @@ export class WorkspaceConfigStore {
 
   private isComplete(cfg: WorkspaceConfig): boolean {
     switch (cfg.provider) {
-      case 'ado': return !!cfg.orgUrl && !!cfg.project;
+      case 'ado': return !!cfg.orgUrl && !!cfg.project && !!cfg.team;
       case 'github': return !!cfg.owner && !!cfg.repo;
       case 'gitlab': return !!cfg.host && !!cfg.projectPath;
       case 'local': return true;

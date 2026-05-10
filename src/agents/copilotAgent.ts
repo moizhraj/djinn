@@ -40,7 +40,7 @@ export class CopilotAgent implements AgentAdapter {
   }
 
   optionsSchema(): AgentOptionField[] {
-    const cfg = vscode.workspace.getConfiguration('anvil');
+    const cfg = vscode.workspace.getConfiguration('djinn');
     return [
       {
         key: 'mode',
