@@ -13,7 +13,7 @@ export class EffortEstimator {
   constructor(private workspaceRoot: vscode.Uri) {}
 
   async estimate(todo: Todo): Promise<number> {
-    const claudeCmd = vscode.workspace.getConfiguration('adoTodos').get<string>('claudeCodeCommand', 'claude');
+    const claudeCmd = vscode.workspace.getConfiguration('anvil').get<string>('claudeCodeCommand', 'claude');
     const viaAgent = await this.estimateWithClaudeCode(todo, claudeCmd);
     if (viaAgent != null) return viaAgent;
     return this.heuristic(todo);

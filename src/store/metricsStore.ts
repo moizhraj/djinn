@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { Metrics } from '../types';
 
-const FILE_REL = '.ado/metrics.json';
+const FILE_REL = '.todos/metrics.json';
 
 const empty = (): Metrics => ({
   tasksCreated: 0,
@@ -9,7 +9,8 @@ const empty = (): Metrics => ({
   agentRunsTriggered: 0,
   totalEstimatedHours: 0,
   totalCompletedHours: 0,
-  hoursSaved: 0
+  hoursSaved: 0,
+  totalTokensUsed: 0
 });
 
 export class MetricsStore {
@@ -18,7 +19,7 @@ export class MetricsStore {
   constructor(private workspaceRoot: vscode.Uri) {}
 
   private fileUri(): vscode.Uri {
-    return vscode.Uri.joinPath(this.workspaceRoot, '.ado', 'metrics.json');
+    return vscode.Uri.joinPath(this.workspaceRoot, '.todos', 'metrics.json');
   }
 
   async load(): Promise<Metrics> {
@@ -48,7 +49,7 @@ export class MetricsStore {
   }
 
   private async save(): Promise<void> {
-    const folder = vscode.Uri.joinPath(this.workspaceRoot, '.ado');
+    const folder = vscode.Uri.joinPath(this.workspaceRoot, '.todos');
     try {
       await vscode.workspace.fs.createDirectory(folder);
     } catch {

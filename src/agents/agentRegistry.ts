@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
-import { AgentType, Todo } from '../types';
+import { AgentOptionField, AgentType, Todo } from '../types';
 import { ClaudeCodeAgent } from './claudeCodeAgent';
 import { CopilotAgent } from './copilotAgent';
-import { AdoCopilotAgent } from './adoCopilotAgent';
-import { AdoConfigStore } from '../config/adoConfig';
+import { OpenIssueAgent } from './openIssueAgent';
+import { WorkspaceConfigStore } from '../config/workspaceConfig';
 import { TodoStore } from '../store/todoStore';
 import { MetricsStore } from '../store/metricsStore';
 
@@ -11,7 +11,14 @@ export interface AgentAdapter {
   type: AgentType;
   label: string;
   isAvailable(): Promise<boolean>;
-  run(todo: Todo): Promise<void>;
+  optionsSchema(): AgentOptionField[];
+  run(todo: Todo, options?: Record<string, string>): Promise<void>;
+}
+
+export interface AgentDescriptor {
+  type: AgentType;
+  label: string;
+  schema: AgentOptionField[];
 }
 
 export class AgentRegistry {
@@ -21,13 +28,13 @@ export class AgentRegistry {
     workspaceRoot: vscode.Uri,
     todos: TodoStore,
     metrics: MetricsStore,
-    cfgStore: AdoConfigStore,
-    secrets: vscode.SecretStorage
+    cfgStore: WorkspaceConfigStore,
+    _secrets: vscode.SecretStorage
   ) {
     this.adapters = [
       new ClaudeCodeAgent(workspaceRoot, todos, metrics),
       new CopilotAgent(workspaceRoot, todos, metrics),
-      new AdoCopilotAgent(workspaceRoot, todos, metrics, cfgStore, secrets)
+      new OpenIssueAgent(todos, metrics, cfgStore)
     ];
   }
 
@@ -41,5 +48,13 @@ export class AgentRegistry {
 
   get(type: AgentType): AgentAdapter | undefined {
     return this.adapters.find(a => a.type === type);
+  }
+
+  list(): AgentAdapter[] {
+    return [...this.adapters];
+  }
+
+  describe(): AgentDescriptor[] {
+    return this.adapters.map(a => ({ type: a.type, label: a.label, schema: a.optionsSchema() }));
   }
 }

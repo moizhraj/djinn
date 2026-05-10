@@ -1,116 +1,235 @@
 import * as vscode from 'vscode';
 import { TodoStore } from './store/todoStore';
 import { MetricsStore } from './store/metricsStore';
-import { AdoConfigStore } from './config/adoConfig';
+import { WorkspaceConfigStore } from './config/workspaceConfig';
+import { migrate } from './config/migration';
 import { TodoTreeProvider, TodoTreeItem } from './ui/todoTreeProvider';
 import { TodoEditorPanel } from './ui/todoEditorPanel';
 import { MetricsPanel } from './ui/metricsPanel';
-import { SyncService } from './ado/sync';
+import { SyncService } from './providers/syncService';
+import { createProvider } from './providers/factory';
 import { EffortEstimator } from './agents/effortEstimator';
 import { AgentRegistry } from './agents/agentRegistry';
-import { ensurePat, setPat } from './config/secrets';
+import { recordEstimatedEffort } from './store/completion';
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
   const folder = vscode.workspace.workspaceFolders?.[0];
   if (!folder) {
-    vscode.window.showWarningMessage('ADO Todos: open a folder to use this extension.');
+    // Still register an empty tree so VS Code doesn't show "no provider".
+    const empty: vscode.TreeDataProvider<never> = { getTreeItem: () => new vscode.TreeItem(''), getChildren: () => [] };
+    context.subscriptions.push(vscode.window.createTreeView('anvil.todoTree', { treeDataProvider: empty }));
+    vscode.window.showWarningMessage('Anvil: open a folder to use this extension.');
     return;
   }
   const root = folder.uri;
 
   const todos = new TodoStore(root);
-  await todos.init();
   const metrics = new MetricsStore(root);
-  await metrics.load();
-  const cfgStore = new AdoConfigStore(root);
+  const cfgStore = new WorkspaceConfigStore(root);
   const estimator = new EffortEstimator(root);
   const sync = new SyncService(todos, metrics, cfgStore, context.secrets, estimator);
   const agents = new AgentRegistry(root, todos, metrics, cfgStore, context.secrets);
 
+  // ── Register UI + commands SYNCHRONOUSLY so the view always binds ──
   const treeProvider = new TodoTreeProvider(todos);
-  const treeView = vscode.window.createTreeView('adoTodos.todoTree', { treeDataProvider: treeProvider });
+  const treeView = vscode.window.createTreeView('anvil.todoTree', { treeDataProvider: treeProvider });
+
+  const version = context.extension.packageJSON.version as string;
+  const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
+  statusBar.command = 'anvil.configure';
+  statusBar.text = `$(checklist) Anvil (${version})`;
+  statusBar.tooltip = 'Click to configure a sync provider.';
+  statusBar.show();
+
+  const refreshStatusBar = async () => {
+    try {
+      const cfg = await cfgStore.load();
+      if (cfg) {
+        statusBar.text = `$(checklist) Anvil: ${cfg.provider} (${version})`;
+        statusBar.tooltip = `Provider: ${cfg.provider}. Click to reconfigure.`;
+      }
+    } catch {
+      // leave default
+    }
+  };
+
+  const updateViewTitle = async () => {
+    try {
+      const cfg = await cfgStore.load();
+      treeView.title = cfg ? `Todos (${cfg.provider})` : 'Todos';
+    } catch {
+      treeView.title = 'Todos';
+    }
+  };
 
   context.subscriptions.push(
     todos,
     treeView,
+    statusBar,
 
-    vscode.commands.registerCommand('adoTodos.refresh', () => treeProvider.refresh()),
+    vscode.commands.registerCommand('anvil.refresh', () => treeProvider.refresh()),
 
-    vscode.commands.registerCommand('adoTodos.add', async () => {
-      const title = await vscode.window.showInputBox({ prompt: 'Todo title', ignoreFocusOut: true });
-      if (!title) return;
-      await todos.add(title.trim());
+    vscode.commands.registerCommand('anvil.add', async () => {
+      try {
+        const title = await vscode.window.showInputBox({ prompt: 'Todo title', ignoreFocusOut: true });
+        if (!title) return;
+        const created = await todos.add(title.trim());
+        // Estimate effort in the background so totals/remaining/completed are
+        // populated immediately without blocking the add UX.
+        void (async () => {
+          try {
+            const total = await estimator.estimate(created);
+            await recordEstimatedEffort(todos, metrics, created.id, total);
+          } catch (e) {
+            console.warn('Effort estimation failed:', e);
+          }
+        })();
+      } catch (e) {
+        vscode.window.showErrorMessage(`Add todo failed: ${e instanceof Error ? e.message : String(e)}`);
+      }
     }),
 
-    vscode.commands.registerCommand('adoTodos.edit', async (arg: TodoTreeItem | string | undefined) => {
+    vscode.commands.registerCommand('anvil.edit', async (arg: TodoTreeItem | string | undefined) => {
       const id = typeof arg === 'string' ? arg : arg?.todo.id;
       if (!id) return;
-      TodoEditorPanel.show(todos, id);
+      TodoEditorPanel.show(todos, agents, id);
     }),
 
-    vscode.commands.registerCommand('adoTodos.delete', async (item: TodoTreeItem) => {
+    vscode.commands.registerCommand('anvil.delete', async (item: TodoTreeItem) => {
       if (!item) return;
       const yes = await vscode.window.showWarningMessage(`Delete "${item.todo.title}"?`, { modal: true }, 'Delete');
       if (yes === 'Delete') await todos.remove(item.todo.id);
     }),
 
-    vscode.commands.registerCommand('adoTodos.sync', async () => {
+    vscode.commands.registerCommand('anvil.sync', async () => {
       await vscode.window.withProgress(
-        { location: vscode.ProgressLocation.Notification, title: 'Syncing todos to Azure DevOps…' },
+        { location: vscode.ProgressLocation.Notification, title: 'Syncing todos…' },
         async () => {
-          const result = await sync.sync();
-          const msg = `Synced. Created: ${result.created}, Updated: ${result.updated}, Failed: ${result.failed}.`;
-          if (result.failed > 0) {
-            vscode.window.showWarningMessage(`${msg}\n${result.errors.join('\n')}`);
-          } else {
-            vscode.window.showInformationMessage(msg);
+          try {
+            const result = await sync.sync();
+            await refreshStatusBar();
+            await updateViewTitle();
+            if (result.skipped > 0 && result.created === 0 && result.updated === 0 && result.failed === 0) {
+              return;
+            }
+            const msg = `Synced. Created: ${result.created}, Updated: ${result.updated}, Failed: ${result.failed}.`;
+            if (result.failed > 0) vscode.window.showWarningMessage(`${msg}\n${result.errors.join('\n')}`);
+            else vscode.window.showInformationMessage(msg);
+          } catch (e) {
+            vscode.window.showErrorMessage(`Sync failed: ${e instanceof Error ? e.message : String(e)}`);
           }
         }
       );
     }),
 
-    vscode.commands.registerCommand('adoTodos.runAgent', async (item: TodoTreeItem) => {
+    vscode.commands.registerCommand('anvil.runAgent', async (item: TodoTreeItem) => {
       if (!item) return;
       const available = await agents.listAvailable();
       if (available.length === 0) {
-        vscode.window.showWarningMessage('No agents available. Install Claude Code, GitHub Copilot, or sync to ADO first.');
+        vscode.window.showWarningMessage('No agents available.');
         return;
       }
-      const pick = await vscode.window.showQuickPick(
-        available.map(a => ({ label: a.label, type: a.type })),
-        { placeHolder: 'Run with which agent?' }
-      );
-      if (!pick) return;
-      const adapter = agents.get(pick.type);
-      if (adapter) await adapter.run(item.todo);
+      const preselected = item.todo.agentOptions?.selected;
+      const preferred = preselected && available.find(a => a.type === preselected);
+      let chosenType = preferred?.type;
+      if (!chosenType) {
+        const pick = await vscode.window.showQuickPick(
+          available.map(a => ({ label: a.label, type: a.type })),
+          { placeHolder: 'Run with which agent?' }
+        );
+        if (!pick) return;
+        chosenType = pick.type;
+      }
+      const adapter = agents.get(chosenType);
+      if (adapter) {
+        const opts = item.todo.agentOptions?.byAgent?.[chosenType];
+        await adapter.run(item.todo, opts);
+      }
     }),
 
-    vscode.commands.registerCommand('adoTodos.openMetrics', async () => {
+    vscode.commands.registerCommand('anvil.openMetrics', async () => {
       await MetricsPanel.show(metrics, todos);
     }),
 
-    vscode.commands.registerCommand('adoTodos.configure', async () => {
-      const cfg = await cfgStore.ensure();
-      if (cfg) {
-        await ensurePat(context.secrets, cfg.orgUrl);
-        vscode.window.showInformationMessage(`ADO configured for ${cfg.project} @ ${cfg.orgUrl}.`);
-      }
-    }),
-
-    vscode.commands.registerCommand('adoTodos.setPat', async () => {
-      const cfg = await cfgStore.ensure();
-      if (!cfg) return;
-      const pat = await vscode.window.showInputBox({
-        prompt: `PAT for ${cfg.orgUrl}`,
-        password: true,
-        ignoreFocusOut: true
-      });
-      if (pat) {
-        await setPat(context.secrets, cfg.orgUrl, pat);
-        vscode.window.showInformationMessage('PAT saved.');
+    vscode.commands.registerCommand('anvil.configure', async () => {
+      try {
+        const existing = await cfgStore.load();
+        if (existing) {
+          const reset = await vscode.window.showQuickPick(
+            ['Keep current provider', 'Switch provider'],
+            { placeHolder: `Current provider: ${existing.provider}` }
+          );
+          if (reset === 'Switch provider') {
+            const { provider: _p, ...rest } = existing;
+            void _p;
+            await cfgStore.save(rest as never);
+          }
+        }
+        const cfg = await cfgStore.ensure();
+        if (cfg) {
+          const provider = createProvider(cfg, context.secrets);
+          if (provider.canSync) await provider.ensureAuth();
+          vscode.window.showInformationMessage(`Configured: ${provider.displayName}.`);
+          await refreshStatusBar();
+          await updateViewTitle();
+        }
+      } catch (e) {
+        vscode.window.showErrorMessage(`Configure failed: ${e instanceof Error ? e.message : String(e)}`);
       }
     })
   );
+
+  // ── Async setup AFTER the view is bound ──
+  // None of the steps below should block the view from rendering or break it on failure.
+  void (async () => {
+    try {
+      await migrate(root);
+    } catch (e) {
+      console.warn('Anvil migration failed:', e);
+    }
+    try {
+      await todos.init();
+    } catch (e) {
+      console.warn('Anvil todoStore init failed:', e);
+    }
+    try {
+      await metrics.load();
+    } catch (e) {
+      console.warn('Anvil metricsStore load failed:', e);
+    }
+
+    let detected;
+    try {
+      detected = await cfgStore.detect();
+    } catch (e) {
+      console.warn('Anvil provider detection failed:', e);
+    }
+    await refreshStatusBar();
+    await updateViewTitle();
+
+    if (detected && detected.provider !== 'local') {
+      const connectKey = `connectPrompted:${root.fsPath}`;
+      if (!context.workspaceState.get<boolean>(connectKey)) {
+        let provider;
+        try {
+          provider = createProvider(detected, context.secrets);
+        } catch (e) {
+          console.warn('Anvil createProvider failed:', e);
+          return;
+        }
+        void context.workspaceState.update(connectKey, true);
+        const choice = await vscode.window.showInformationMessage(
+          `Detected ${provider.displayName} repo. Connect to enable sync?`,
+          'Connect',
+          'Not now'
+        );
+        if (choice === 'Connect') {
+          const ok = await provider.ensureAuth();
+          if (ok) vscode.window.showInformationMessage(`${provider.displayName}: connected.`);
+        }
+      }
+    }
+  })();
 }
 
 export function deactivate(): void {

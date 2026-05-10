@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { v4 as uuidv4 } from 'uuid';
 import { Todo, TodoStoreFile, TodoStatus } from '../types';
 
-const FILE_REL = '.ado/todos.json';
+const FILE_REL = '.todos/todos.json';
 
 export class TodoStore {
   private _onDidChange = new vscode.EventEmitter<void>();
@@ -32,7 +32,7 @@ export class TodoStore {
   }
 
   private fileUri(): vscode.Uri {
-    return vscode.Uri.joinPath(this.workspaceRoot, '.ado', 'todos.json');
+    return vscode.Uri.joinPath(this.workspaceRoot, '.todos', 'todos.json');
   }
 
   private async load(): Promise<void> {
@@ -47,7 +47,7 @@ export class TodoStore {
   }
 
   private async save(): Promise<void> {
-    const folder = vscode.Uri.joinPath(this.workspaceRoot, '.ado');
+    const folder = vscode.Uri.joinPath(this.workspaceRoot, '.todos');
     try {
       await vscode.workspace.fs.createDirectory(folder);
     } catch {
@@ -83,12 +83,17 @@ export class TodoStore {
   async update(id: string, patch: Partial<Todo>): Promise<Todo | undefined> {
     const idx = this.cache.items.findIndex(t => t.id === id);
     if (idx < 0) return undefined;
+    const existing = this.cache.items[idx];
+    const now = new Date().toISOString();
     const merged: Todo = {
-      ...this.cache.items[idx],
+      ...existing,
       ...patch,
-      id: this.cache.items[idx].id,
-      updatedAt: new Date().toISOString()
+      id: existing.id,
+      updatedAt: now
     };
+    if (patch.status === 'done' && !existing.completedAt) {
+      merged.completedAt = now;
+    }
     this.cache.items[idx] = merged;
     await this.save();
     this._onDidChange.fire();

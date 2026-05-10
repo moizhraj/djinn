@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "deny": [
+      "Edit(src/config/secrets.ts)",
+      "Write(src/config/secrets.ts)",
+      "Edit(.env)",
+      "Edit(.env.*)",
+      "Write(.env)",
+      "Write(.env.*)"
+    ],
+    "allow": [
+      "Bash(npm run compile)",
+      "Bash(npm run watch)",
+      "Bash(npx tsc:*)"
+    ]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx tsc --noEmit -p ./"
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"var f=process.env.ANVIL_DONE_FILE;if(f){var fs=require('fs'),p=require('path');fs.mkdirSync(p.dirname(f),{recursive:true});fs.closeSync(fs.openSync(f,'a'))}\""
+          }
+        ]
+      }
+    ]
+  }
+}

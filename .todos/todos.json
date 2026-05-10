@@ -1,0 +1,289 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "c35885f7-167e-478d-8cb1-491be353b453",
+      "title": "Allow more options when adding, updating the task",
+      "status": "done",
+      "createdAt": "2026-05-09T23:43:43.629Z",
+      "updatedAt": "2026-05-09T23:55:49.063Z",
+      "description": "User should have an option to configure model, agent, reasoning and approvals. The extension should although populate the default ones. ",
+      "agent": {
+        "type": "claude-code",
+        "lastRunAt": "2026-05-09T23:45:12.973Z",
+        "lastOutputSnippet": "Workspace: ado-extension\nPath: c:\\Source\\ado-extension\nTop-level dirs: media, out, scripts, src\nManifests: package.json\nREADME excerpt:\n# ADO Todo Sync\n\nCapture todos in your repo and sync them to Azure DevOps. Delegate work to\nClaude Code, GitHub Copilot, or ADO Copilot agents and track progress and\neffort metrics in VS Code.\r\n\nTask: Allow more options when adding, updating the task\nDetails: User should have an option to configure model, agent, reasoning and approvals. The extension should alth"
+      }
+    },
+    {
+      "id": "690d6b2a-4818-4043-bce2-04f9655f0cdc",
+      "title": "Fix the naming of agent package",
+      "status": "done",
+      "createdAt": "2026-05-09T23:59:29.627Z",
+      "updatedAt": "2026-05-10T00:03:06.025Z",
+      "description": "The naming used for Agent configuration (Model, Reasoning, Approvals) should come from claude or github copilot. Along with the model number available for the user.",
+      "agentOptions": {
+        "selected": "claude-code",
+        "byAgent": {
+          "claude-code": {
+            "model": "sonnet",
+            "reasoning": "none",
+            "approvals": "default"
+          },
+          "copilot": {
+            "mode": "agent"
+          }
+        }
+      },
+      "agent": {
+        "type": "claude-code",
+        "lastRunAt": "2026-05-10T00:00:41.503Z",
+        "lastOutputSnippet": "Workspace: ado-extension\nPath: c:\\Source\\ado-extension\nTop-level dirs: media, out, scripts, src\nManifests: package.json\nREADME excerpt:\n# ADO Todo Sync\n\nCapture todos in your repo and sync them to Azure DevOps. Delegate work to\nClaude Code, GitHub Copilot, or ADO Copilot agents and track progress and\neffort metrics in VS Code.\r\n\nTask: Fix the naming of agent package\nDetails: The naming used for Agent configuration (Model, Reasoning, Approvals) should come from claude or github copilot. Along wit"
+      }
+    },
+    {
+      "id": "c0d4f563-4247-4656-9f37-ef750fa746fd",
+      "title": "Effort estimations are not updated",
+      "status": "done",
+      "createdAt": "2026-05-10T00:03:34.231Z",
+      "updatedAt": "2026-05-10T00:12:00.213Z",
+      "description": "The efforts like total, remaining and completed are not populated. Also even on the completion of task, the efforts are not updated when i am looking at the metrics. Apart from this, on each task completion, the effort and token usage for the task should be updated and the same should reflect in the metrics. ",
+      "agentOptions": {
+        "selected": "claude-code",
+        "byAgent": {
+          "claude-code": {
+            "model": "claude-opus-4-7",
+            "reasoning": "think-hard",
+            "approvals": "acceptEdits"
+          },
+          "copilot": {
+            "mode": "agent"
+          }
+        }
+      },
+      "agent": {
+        "type": "claude-code",
+        "lastRunAt": "2026-05-10T00:07:23.330Z",
+        "lastOutputSnippet": "Workspace: ado-extension\nPath: c:\\Source\\ado-extension\nTop-level dirs: media, out, scripts, src\nManifests: package.json\nREADME excerpt:\n# ADO Todo Sync\n\nCapture todos in your repo and sync them to Azure DevOps. Delegate work to\nClaude Code, GitHub Copilot, or ADO Copilot agents and track progress and\neffort metrics in VS Code.\r\n\nTask: Effort estimations are not updated\nDetails: The efforts like total, remaining and completed are not populated. Also even on the completion of task, the efforts are"
+      }
+    },
+    {
+      "id": "bbbccd1b-90e3-4b7c-a191-d3d1f69b0fd8",
+      "title": "extension rename",
+      "status": "done",
+      "createdAt": "2026-05-10T00:17:35.808Z",
+      "updatedAt": "2026-05-10T00:21:59.691Z",
+      "effort": {
+        "total": 2,
+        "remaining": 0,
+        "completed": 2
+      },
+      "effortCounted": true,
+      "description": "I would like to rename the extension to `Anvil`",
+      "agentOptions": {
+        "selected": "claude-code",
+        "byAgent": {
+          "claude-code": {
+            "model": "claude-sonnet-4-6",
+            "reasoning": "think",
+            "approvals": "acceptEdits"
+          },
+          "copilot": {
+            "mode": "agent"
+          }
+        }
+      },
+      "agent": {
+        "type": "claude-code",
+        "lastRunAt": "2026-05-10T00:19:39.703Z",
+        "lastOutputSnippet": "Workspace: ado-extension\nPath: c:\\Source\\ado-extension\nTop-level dirs: media, out, scripts, src\nManifests: package.json\nREADME excerpt:\n# ADO Todo Sync\n\nCapture todos in your repo and sync them to Azure DevOps. Delegate work to\nClaude Code, GitHub Copilot, or ADO Copilot agents and track progress and\neffort metrics in VS Code.\r\n\nTask: extension rename\nDetails: I would like to rename the extension to `Anvil`\nthink"
+      },
+      "tokensUsed": 158,
+      "completionCounted": true
+    },
+    {
+      "id": "65e937e1-16b9-4e6b-b4db-dada33985a4f",
+      "title": "Task completion updates",
+      "status": "done",
+      "createdAt": "2026-05-10T00:24:25.575Z",
+      "updatedAt": "2026-05-10T00:31:06.113Z",
+      "effort": {
+        "total": 2,
+        "remaining": 0,
+        "completed": 2
+      },
+      "effortCounted": true,
+      "description": "The task should be marked completed as soon as its done in the CLI. Currently it waits until the session is exited and then marks it as done. ",
+      "agentOptions": {
+        "selected": "claude-code",
+        "byAgent": {
+          "claude-code": {
+            "model": "claude-opus-4-7",
+            "reasoning": "think-hard",
+            "approvals": "acceptEdits"
+          },
+          "copilot": {
+            "mode": "agent"
+          }
+        }
+      },
+      "agent": {
+        "type": "claude-code",
+        "lastRunAt": "2026-05-10T00:25:42.280Z",
+        "lastOutputSnippet": "Workspace: ado-extension\nPath: c:\\Source\\ado-extension\nTop-level dirs: media, out, scripts, src\nManifests: package.json\nREADME excerpt:\n# Anvil\n\nCapture todos in your repo and sync them to Azure DevOps, GitHub, or GitLab. Delegate work to\nClaude Code, GitHub Copilot, or ADO Copilot agents and track progress and\neffort metrics in VS Code.\n\nTask: Task completion updates\nDetails: The task should be marked completed as soon as its done in the CLI. Currently it waits until the session is exited and t"
+      },
+      "tokensUsed": 0,
+      "completionCounted": true
+    },
+    {
+      "id": "d95f7e9a-70a6-42e9-8e10-75ec82728e6d",
+      "title": "Update the extension icon to an anvil",
+      "status": "done",
+      "createdAt": "2026-05-10T00:29:09.467Z",
+      "updatedAt": "2026-05-10T00:31:03.086Z",
+      "effort": {
+        "total": 1,
+        "remaining": 0,
+        "completed": 1
+      },
+      "effortCounted": true,
+      "description": "Update the extension icon to an anvil to reflect its name",
+      "agentOptions": {
+        "selected": "claude-code",
+        "byAgent": {
+          "claude-code": {
+            "model": "claude-opus-4-7",
+            "reasoning": "think",
+            "approvals": "acceptEdits"
+          },
+          "copilot": {
+            "mode": "agent"
+          }
+        }
+      },
+      "agent": {
+        "type": "claude-code",
+        "lastRunAt": "2026-05-10T00:29:50.909Z",
+        "lastOutputSnippet": "Workspace: ado-extension\nPath: c:\\Source\\ado-extension\nTop-level dirs: media, out, scripts, src\nManifests: package.json\nREADME excerpt:\n# Anvil\n\nCapture todos in your repo and sync them to Azure DevOps, GitHub, or GitLab. Delegate work to\nClaude Code, GitHub Copilot, or ADO Copilot agents and track progress and\neffort metrics in VS Code.\n\nTask: Update the extension icon to an anvil\nDetails: Update the extension icon to an anvil to reflect its name\nthink"
+      },
+      "tokensUsed": 781,
+      "completionCounted": true
+    },
+    {
+      "id": "6c6fddf6-3893-48a9-a8b9-2eefbc5d38f9",
+      "title": "Task listing when added",
+      "status": "done",
+      "createdAt": "2026-05-10T00:30:50.792Z",
+      "updatedAt": "2026-05-10T00:36:39.965Z",
+      "effort": {
+        "total": 3,
+        "remaining": 0,
+        "completed": 3
+      },
+      "effortCounted": true,
+      "description": "New tasks should be added on top of the list in the extension instead of at the bottom. The task should show more information around when it was created and when it was completed.",
+      "agentOptions": {
+        "selected": "claude-code",
+        "byAgent": {
+          "claude-code": {
+            "model": "claude-sonnet-4-6",
+            "reasoning": "think",
+            "approvals": "acceptEdits"
+          },
+          "copilot": {
+            "mode": "agent"
+          }
+        }
+      },
+      "agent": {
+        "type": "claude-code",
+        "lastRunAt": "2026-05-10T00:35:20.152Z",
+        "lastOutputSnippet": "Workspace: ado-extension\nPath: c:\\Source\\ado-extension\nTop-level dirs: media, out, scripts, src\nManifests: package.json\nREADME excerpt:\n# Anvil\n\nCapture todos in your repo and sync them to Azure DevOps, GitHub, or GitLab. Delegate work to\nClaude Code, GitHub Copilot, or ADO Copilot agents and track progress and\neffort metrics in VS Code.\n\nTask: Task listing when added\nDetails: New tasks should be added on top of the list in the extension instead of at the bottom. The task should show more inform"
+      },
+      "tokensUsed": 897,
+      "completionCounted": true
+    },
+    {
+      "id": "05efb897-2293-406f-9045-8046311dc4fd",
+      "title": "Extension icon update",
+      "status": "done",
+      "createdAt": "2026-05-10T00:39:18.805Z",
+      "updatedAt": "2026-05-10T00:41:26.878Z",
+      "effort": {
+        "total": 1,
+        "remaining": 0,
+        "completed": 1
+      },
+      "effortCounted": true,
+      "description": "I would like to update the extension icon used. I dont like the anvil icon and it looks skewed. Find a better icon and use it. ",
+      "agentOptions": {
+        "selected": "claude-code",
+        "byAgent": {
+          "claude-code": {
+            "model": "claude-opus-4-7",
+            "reasoning": "ultrathink",
+            "approvals": "acceptEdits"
+          },
+          "copilot": {
+            "mode": "agent"
+          }
+        }
+      },
+      "agent": {
+        "type": "claude-code",
+        "lastRunAt": "2026-05-10T00:40:04.825Z",
+        "lastOutputSnippet": "Workspace: ado-extension\nPath: c:\\Source\\ado-extension\nTop-level dirs: media, out, scripts, src\nManifests: package.json\nREADME excerpt:\n# Anvil\n\nCapture todos in your repo and sync them to Azure DevOps, GitHub, or GitLab. Delegate work to\nClaude Code, GitHub Copilot, or ADO Copilot agents and track progress and\neffort metrics in VS Code.\n\nTask: Extension icon update\nDetails: I would like to update the extension icon used. I dont like the anvil icon and it looks skewed. Find a better icon and use"
+      },
+      "tokensUsed": 570,
+      "completionCounted": true,
+      "completedAt": "2026-05-10T00:41:26.878Z"
+    },
+    {
+      "id": "5f9cd29d-8bc6-4ca2-9441-340c52a1dd26",
+      "title": "Add agent completed time for task",
+      "status": "done",
+      "createdAt": "2026-05-10T00:47:42.201Z",
+      "updatedAt": "2026-05-10T00:49:45.592Z",
+      "effort": {
+        "total": 2,
+        "remaining": 0,
+        "completed": 2
+      },
+      "effortCounted": true,
+      "description": "The task estimation should also have a field that shows how long it took for the agent to complete and should be auto populated upon completion.",
+      "agentOptions": {
+        "selected": "claude-code",
+        "byAgent": {
+          "claude-code": {
+            "model": "claude-sonnet-4-6",
+            "reasoning": "think",
+            "approvals": "acceptEdits"
+          },
+          "copilot": {
+            "mode": "agent"
+          }
+        }
+      },
+      "agent": {
+        "type": "claude-code",
+        "lastRunAt": "2026-05-10T00:48:08.421Z",
+        "lastOutputSnippet": "Workspace: ado-extension\nPath: c:\\Source\\ado-extension\nTop-level dirs: media, out, scripts, src\nManifests: package.json\nREADME excerpt:\n# Anvil\n\nCapture todos in your repo and sync them to Azure DevOps, GitHub, or GitLab. Delegate work to\nClaude Code, GitHub Copilot, or ADO Copilot agents and track progress and\neffort metrics in VS Code.\n\nTask: Add agent completed time for task\nDetails: The task estimation should also have a field that shows how long it took for the agent to complete and should "
+      },
+      "tokensUsed": 626,
+      "completionCounted": true,
+      "completedAt": "2026-05-10T00:49:45.592Z"
+    },
+    {
+      "id": "d4494606-dde4-4426-96e0-35e6f40d8118",
+      "title": "Imporve the agent metrics dashboard",
+      "status": "draft",
+      "createdAt": "2026-05-10T00:51:32.076Z",
+      "updatedAt": "2026-05-10T00:51:42.507Z",
+      "effort": {
+        "total": 8,
+        "remaining": 8,
+        "completed": 0
+      },
+      "effortCounted": true
+    }
+  ]
+}

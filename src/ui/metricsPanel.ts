@@ -19,8 +19,8 @@ export class MetricsPanel {
 
   private constructor(private metrics: MetricsStore, private todos: TodoStore) {
     this.panel = vscode.window.createWebviewPanel(
-      'adoTodos.metrics',
-      'ADO Todos · Metrics',
+      'anvil.metrics',
+      'Anvil · Metrics',
       vscode.ViewColumn.One,
       { enableScripts: false }
     );
@@ -57,7 +57,7 @@ export class MetricsPanel {
   .value { font-size: 28px; font-weight: 700; }
   .label { color: var(--vscode-descriptionForeground); margin-top: 4px; }
 </style></head><body>
-  <h1>ADO Todos · Metrics</h1>
+  <h1>Anvil · Metrics</h1>
 
   <h2>Activity</h2>
   <div class="grid">
@@ -71,6 +71,11 @@ export class MetricsPanel {
     ${card('Estimated', m.totalEstimatedHours.toFixed(1))}
     ${card('Completed', m.totalCompletedHours.toFixed(1))}
     ${card('Saved', m.hoursSaved.toFixed(1))}
+  </div>
+
+  <h2>Tokens</h2>
+  <div class="grid">
+    ${card('Total tokens used', (m.totalTokensUsed ?? 0).toLocaleString())}
   </div>
 
   <h2>Pipeline (current)</h2>

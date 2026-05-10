@@ -1,73 +1,101 @@
 {
-  "name": "ado-todo-sync",
-  "displayName": "ADO Todo Sync",
-  "description": "Capture todos in your repo and sync them to Azure DevOps. Delegate work to Claude Code, Copilot, or ADO Copilot agents.",
-  "version": "0.1.0",
+  "name": "anvil",
+  "displayName": "Anvil",
+  "description": "Capture todos in your repo and sync them to Azure DevOps, GitHub, or GitLab. Delegate work to Claude Code or Copilot agents.",
+  "version": "0.3.4",
   "publisher": "moizmh",
   "engines": {
-    "vscode": "^1.85.0"
+    "vscode": "^1.93.0"
   },
   "categories": ["Other"],
   "main": "./out/extension.js",
   "activationEvents": [
-    "onView:adoTodos.todoTree",
+    "onView:anvil.todoTree",
+    "workspaceContains:.todos/todos.json",
     "workspaceContains:.ado/todos.json"
   ],
   "contributes": {
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "adoTodos",
-          "title": "ADO Todos",
+          "id": "anvil",
+          "title": "Anvil",
           "icon": "media/icon.svg"
         }
       ]
     },
     "views": {
-      "adoTodos": [
+      "anvil": [
         {
-          "id": "adoTodos.todoTree",
+          "id": "anvil.todoTree",
           "name": "Todos"
         }
       ]
     },
     "commands": [
-      { "command": "adoTodos.add", "title": "ADO Todos: Add Todo", "icon": "$(add)" },
-      { "command": "adoTodos.sync", "title": "ADO Todos: Sync to Azure DevOps", "icon": "$(cloud-upload)" },
-      { "command": "adoTodos.refresh", "title": "ADO Todos: Refresh", "icon": "$(refresh)" },
-      { "command": "adoTodos.edit", "title": "Edit", "icon": "$(edit)" },
-      { "command": "adoTodos.delete", "title": "Delete", "icon": "$(trash)" },
-      { "command": "adoTodos.runAgent", "title": "Run with Agent…", "icon": "$(play)" },
-      { "command": "adoTodos.openMetrics", "title": "ADO Todos: Open Metrics Dashboard", "icon": "$(graph)" },
-      { "command": "adoTodos.configure", "title": "ADO Todos: Configure" },
-      { "command": "adoTodos.setPat", "title": "ADO Todos: Set Personal Access Token" }
+      { "command": "anvil.add", "title": "Anvil: Add Todo", "icon": "$(add)" },
+      { "command": "anvil.sync", "title": "Anvil: Sync", "icon": "$(cloud-upload)" },
+      { "command": "anvil.refresh", "title": "Anvil: Refresh", "icon": "$(refresh)" },
+      { "command": "anvil.edit", "title": "Edit", "icon": "$(edit)" },
+      { "command": "anvil.delete", "title": "Delete", "icon": "$(trash)" },
+      { "command": "anvil.runAgent", "title": "Run with Agent…", "icon": "$(play)" },
+      { "command": "anvil.openMetrics", "title": "Anvil: Open Metrics Dashboard", "icon": "$(graph)" },
+      { "command": "anvil.configure", "title": "Anvil: Configure Provider" }
     ],
     "menus": {
       "view/title": [
-        { "command": "adoTodos.add", "when": "view == adoTodos.todoTree", "group": "navigation@1" },
-        { "command": "adoTodos.sync", "when": "view == adoTodos.todoTree", "group": "navigation@2" },
-        { "command": "adoTodos.openMetrics", "when": "view == adoTodos.todoTree", "group": "navigation@3" },
-        { "command": "adoTodos.refresh", "when": "view == adoTodos.todoTree", "group": "navigation@4" }
+        { "command": "anvil.add", "when": "view == anvil.todoTree", "group": "navigation@1" },
+        { "command": "anvil.sync", "when": "view == anvil.todoTree", "group": "navigation@2" },
+        { "command": "anvil.openMetrics", "when": "view == anvil.todoTree", "group": "navigation@3" },
+        { "command": "anvil.refresh", "when": "view == anvil.todoTree", "group": "navigation@4" }
       ],
       "view/item/context": [
-        { "command": "adoTodos.runAgent", "when": "view == adoTodos.todoTree && viewItem == todo", "group": "inline@1" },
-        { "command": "adoTodos.edit", "when": "view == adoTodos.todoTree && viewItem == todo", "group": "inline@2" },
-        { "command": "adoTodos.delete", "when": "view == adoTodos.todoTree && viewItem == todo", "group": "inline@3" }
+        { "command": "anvil.runAgent", "when": "view == anvil.todoTree && viewItem == todo", "group": "inline@1" },
+        { "command": "anvil.delete", "when": "view == anvil.todoTree && viewItem == todo", "group": "inline@2" }
       ]
     },
     "configuration": {
-      "title": "ADO Todo Sync",
+      "title": "Anvil",
       "properties": {
-        "adoTodos.defaultAgent": {
+        "anvil.defaultAgent": {
           "type": "string",
-          "enum": ["claude-code", "copilot", "ado-copilot"],
+          "enum": ["claude-code", "copilot", "open-issue"],
           "default": "claude-code",
           "description": "Default agent to run when 'Run with Agent' has no explicit choice."
         },
-        "adoTodos.claudeCodeCommand": {
+        "anvil.claudeCodeCommand": {
           "type": "string",
           "default": "claude",
           "description": "Command used to invoke Claude Code CLI."
+        },
+        "anvil.claudeCode.model": {
+          "type": "string",
+          "enum": ["sonnet", "opus", "haiku"],
+          "default": "sonnet",
+          "description": "Default model for Claude Code agent runs."
+        },
+        "anvil.claudeCode.reasoning": {
+          "type": "string",
+          "enum": ["none", "think", "think-hard", "ultrathink"],
+          "default": "none",
+          "description": "Default reasoning intensity hint appended to Claude Code prompts."
+        },
+        "anvil.claudeCode.approvals": {
+          "type": "string",
+          "enum": ["default", "acceptEdits", "plan", "bypassPermissions"],
+          "default": "default",
+          "description": "Default --permission-mode for Claude Code."
+        },
+        "anvil.copilot.mode": {
+          "type": "string",
+          "enum": ["agent", "edit", "ask"],
+          "default": "agent",
+          "description": "Default Copilot Chat mode slash-command."
+        },
+        "anvil.copilot.model": {
+          "type": "string",
+          "default": "",
+          "description": "Optional model hint included in the Copilot prompt."
         }
       }
     }
@@ -79,13 +107,15 @@
     "package": "vsce package"
   },
   "dependencies": {
+    "@gitbeaker/rest": "^40.5.1",
+    "@octokit/rest": "^21.0.2",
     "azure-devops-node-api": "^14.0.2",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
     "@types/uuid": "^9.0.8",
-    "@types/vscode": "^1.85.0",
+    "@types/vscode": "^1.93.0",
     "@vscode/vsce": "^3.2.1",
     "typescript": "^5.4.5"
   }

@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(pwsh scripts/build-vsix.ps1)",
+      "Bash(npm run *)"
+    ]
+  }
+}

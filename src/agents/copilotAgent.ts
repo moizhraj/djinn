@@ -1,9 +1,24 @@
 import * as vscode from 'vscode';
-import { Todo } from '../types';
+import { AgentOptionField, Todo } from '../types';
 import { AgentAdapter } from './agentRegistry';
 import { TodoStore } from '../store/todoStore';
 import { MetricsStore } from '../store/metricsStore';
 import { buildWorkspaceContext } from './contextBuilder';
+
+const MODE_CHOICES = [
+  { value: 'agent', label: 'Agent' },
+  { value: 'edit', label: 'Edit' },
+  { value: 'ask', label: 'Ask' }
+];
+
+const COPILOT_MODEL_CHOICES = [
+  { value: '', label: 'Default (Copilot picks)' },
+  { value: 'gpt-4o', label: 'GPT-4o' },
+  { value: 'gpt-4.1', label: 'GPT-4.1' },
+  { value: 'claude-sonnet-4-5', label: 'Claude Sonnet 4.5' },
+  { value: 'o3', label: 'o3' },
+  { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash' }
+];
 
 /**
  * Delegates to the GitHub Copilot extension's chat by opening Copilot Chat with
@@ -24,11 +39,35 @@ export class CopilotAgent implements AgentAdapter {
       || !!vscode.extensions.getExtension('GitHub.copilot');
   }
 
-  async run(todo: Todo): Promise<void> {
+  optionsSchema(): AgentOptionField[] {
+    const cfg = vscode.workspace.getConfiguration('anvil');
+    return [
+      {
+        key: 'mode',
+        label: 'Mode',
+        type: 'select',
+        choices: MODE_CHOICES,
+        default: cfg.get<string>('copilot.mode', 'agent')
+      },
+      {
+        key: 'model',
+        label: 'Model',
+        type: 'select',
+        choices: COPILOT_MODEL_CHOICES,
+        default: cfg.get<string>('copilot.model', ''),
+        description: 'Preferred model to hint in the prompt. Copilot ultimately picks based on its own settings.'
+      }
+    ];
+  }
+
+  async run(todo: Todo, options?: Record<string, string>): Promise<void> {
+    const opts = this.resolveOptions(options);
     const ctx = await buildWorkspaceContext(this.workspaceRoot);
+    const modeSlash = `/${opts.mode || 'agent'}`;
+    const modelHint = opts.model ? `(model: ${opts.model})\n` : '';
     const query = [
-      `@workspace /agent ${todo.title}`,
-      todo.description ?? '',
+      `@workspace ${modeSlash} ${todo.title}`,
+      modelHint + (todo.description ?? ''),
       '',
       ctx
     ].filter(Boolean).join('\n');
@@ -44,5 +83,13 @@ export class CopilotAgent implements AgentAdapter {
     } catch (e) {
       vscode.window.showWarningMessage(`Could not open Copilot Chat: ${e instanceof Error ? e.message : String(e)}`);
     }
+  }
+
+  private resolveOptions(options?: Record<string, string>): Record<string, string> {
+    const out: Record<string, string> = {};
+    for (const f of this.optionsSchema()) {
+      out[f.key] = (options?.[f.key] ?? f.default ?? '').trim();
+    }
+    return out;
   }
 }
