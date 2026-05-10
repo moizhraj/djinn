@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "hooks": {
+    "agentStop": [
+      {
+        "type": "command",
+        "powershell": "pwsh -NoProfile -ExecutionPolicy Bypass -File .github/hooks/build-vsix.ps1",
+        "bash": "pwsh -NoProfile -ExecutionPolicy Bypass -File .github/hooks/build-vsix.ps1",
+        "cwd": ".",
+        "timeoutSec": 600
+      }
+    ]
+  }
+}

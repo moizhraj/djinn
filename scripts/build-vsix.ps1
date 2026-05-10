@@ -32,7 +32,7 @@ Write-Host "==> Packaging .vsix" -ForegroundColor Cyan
 Get-ChildItem -Path $root -Filter '*.vsix' | Remove-Item -Force
 
 $vsceCmd = Join-Path $root 'node_modules/.bin/vsce.cmd'
-$vsceArgs = @('package')
+$vsceArgs = @('package', '--allow-missing-repository')
 if (-not (Test-Path "$root/LICENSE")) { $vsceArgs += '--skip-license' }
 
 & $vsceCmd @vsceArgs
