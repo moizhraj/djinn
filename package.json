@@ -2,7 +2,7 @@
   "name": "djinn",
   "displayName": "Djinn",
   "description": "Capture todos in your repo and sync them to Azure DevOps, GitHub, or GitLab. Delegate work to Claude Code or Copilot agents.",
-  "version": "0.3.12",
+  "version": "0.4.0",
   "publisher": "moizmh",
   "engines": {
     "vscode": "^1.93.0"
