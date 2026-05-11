@@ -3,21 +3,16 @@ import { TodoStore } from './store/todoStore';
 import { MetricsStore } from './store/metricsStore';
 import { WorkspaceConfigStore } from './config/workspaceConfig';
 import { migrate } from './config/migration';
-import { TodoTreeProvider, TodoTreeItem } from './ui/todoTreeProvider';
-import { TodoEditorPanel } from './ui/todoEditorPanel';
+import { TodoEditorViewProvider } from './ui/todoEditorViewProvider';
 import { MetricsPanel } from './ui/metricsPanel';
 import { SyncService } from './providers/syncService';
 import { createProvider } from './providers/factory';
 import { EffortEstimator } from './agents/effortEstimator';
 import { AgentRegistry } from './agents/agentRegistry';
-import { recordEstimatedEffort } from './store/completion';
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
   const folder = vscode.workspace.workspaceFolders?.[0];
   if (!folder) {
-    // Still register an empty tree so VS Code doesn't show "no provider".
-    const empty: vscode.TreeDataProvider<never> = { getTreeItem: () => new vscode.TreeItem(''), getChildren: () => [] };
-    context.subscriptions.push(vscode.window.createTreeView('djinn.todoTree', { treeDataProvider: empty }));
     vscode.window.showWarningMessage('Djinn: open a folder to use this extension.');
     return;
   }
@@ -31,8 +26,12 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   const agents = new AgentRegistry(root, todos, metrics, cfgStore, context.secrets);
 
   // ── Register UI + commands SYNCHRONOUSLY so the view always binds ──
-  const treeProvider = new TodoTreeProvider(todos);
-  const treeView = vscode.window.createTreeView('djinn.todoTree', { treeDataProvider: treeProvider });
+  const editorView = new TodoEditorViewProvider(todos, metrics, agents, estimator);
+  const editorRegistration = vscode.window.registerWebviewViewProvider(
+    TodoEditorViewProvider.viewId,
+    editorView,
+    { webviewOptions: { retainContextWhenHidden: true } }
+  );
 
   const version = context.extension.packageJSON.version as string;
   const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
@@ -53,52 +52,55 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     }
   };
 
-  const updateViewTitle = async () => {
-    try {
-      const cfg = await cfgStore.load();
-      treeView.title = cfg ? `Todos (${cfg.provider})` : 'Todos';
-    } catch {
-      treeView.title = 'Todos';
-    }
-  };
+  // Provider name no longer needs to drive a tree-view title — it's already
+  // visible in the status bar. Keeping a no-op so the rest of the file's
+  // call sites compile without churn.
+  const updateViewTitle = async () => { /* noop */ };
+  void updateViewTitle;
 
   context.subscriptions.push(
     todos,
-    treeView,
+    editorRegistration,
     statusBar,
 
-    vscode.commands.registerCommand('djinn.refresh', () => treeProvider.refresh()),
+    vscode.commands.registerCommand('djinn.refresh', () => {
+      // Tree is gone; the webview re-renders on store changes automatically.
+      // The command is still registered so existing keybindings / palette
+      // entries don't break — and we trigger a manual refresh by
+      // re-loading the store from disk in case external edits were missed.
+      void todos.init();
+    }),
 
     vscode.commands.registerCommand('djinn.add', async () => {
+      // The form *is* the create UI now: clear the editor and reveal it.
+      editorView.setTodo(null);
       try {
-        const title = await vscode.window.showInputBox({ prompt: 'Todo title', ignoreFocusOut: true });
-        if (!title) return;
-        const created = await todos.add(title.trim());
-        // Estimate effort in the background so totals/remaining/completed are
-        // populated immediately without blocking the add UX.
-        void (async () => {
-          try {
-            const total = await estimator.estimate(created);
-            await recordEstimatedEffort(todos, metrics, created.id, total);
-          } catch (e) {
-            console.warn('Effort estimation failed:', e);
-          }
-        })();
-      } catch (e) {
-        vscode.window.showErrorMessage(`Add todo failed: ${e instanceof Error ? e.message : String(e)}`);
+        await vscode.commands.executeCommand('djinn.todoEditor.focus');
+      } catch {
+        // view may not have rendered yet; setTodo will apply on first resolve
       }
     }),
 
-    vscode.commands.registerCommand('djinn.edit', async (arg: TodoTreeItem | string | undefined) => {
-      const id = typeof arg === 'string' ? arg : arg?.todo.id;
+    vscode.commands.registerCommand('djinn.edit', async (arg: { todo?: { id: string } } | string | undefined) => {
+      const id = typeof arg === 'string' ? arg : (arg && typeof arg === 'object' && arg.todo ? arg.todo.id : undefined);
       if (!id) return;
-      TodoEditorPanel.show(todos, agents, id, estimator);
+      editorView.setTodo(id);
+      try {
+        await vscode.commands.executeCommand('djinn.todoEditor.focus');
+      } catch {
+        // view not rendered yet — setTodo is cached and will apply on resolve
+      }
     }),
 
-    vscode.commands.registerCommand('djinn.delete', async (item: TodoTreeItem) => {
-      if (!item) return;
-      const yes = await vscode.window.showWarningMessage(`Delete "${item.todo.title}"?`, { modal: true }, 'Delete');
-      if (yes === 'Delete') await todos.remove(item.todo.id);
+    vscode.commands.registerCommand('djinn.delete', async (arg: { todo?: { id: string; title: string } } | string | undefined) => {
+      // Still callable from the command palette; the in-panel rows route
+      // through the webview's message handler instead.
+      const id = typeof arg === 'string' ? arg : (arg && typeof arg === 'object' && arg.todo ? arg.todo.id : undefined);
+      if (!id) return;
+      const target = todos.list().find(t => t.id === id);
+      if (!target) return;
+      const yes = await vscode.window.showWarningMessage(`Delete "${target.title}"?`, { modal: true }, 'Delete');
+      if (yes === 'Delete') await todos.remove(id);
     }),
 
     vscode.commands.registerCommand('djinn.sync', async () => {
@@ -108,7 +110,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
           try {
             const result = await sync.sync();
             await refreshStatusBar();
-            await updateViewTitle();
             if (result.skipped > 0 && result.created === 0 && result.updated === 0 && result.failed === 0) {
               return;
             }
@@ -122,14 +123,17 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       );
     }),
 
-    vscode.commands.registerCommand('djinn.runAgent', async (item: TodoTreeItem) => {
-      if (!item) return;
+    vscode.commands.registerCommand('djinn.runAgent', async (arg: { todo?: { id: string } } | string | undefined) => {
+      const id = typeof arg === 'string' ? arg : (arg && typeof arg === 'object' && arg.todo ? arg.todo.id : undefined);
+      if (!id) return;
+      const target = todos.list().find(t => t.id === id);
+      if (!target) return;
       const available = await agents.listAvailable();
       if (available.length === 0) {
         vscode.window.showWarningMessage('No agents available.');
         return;
       }
-      const preselected = item.todo.agentOptions?.selected;
+      const preselected = target.agentOptions?.selected;
       const preferred = preselected && available.find(a => a.type === preselected);
       let chosenType = preferred?.type;
       if (!chosenType) {
@@ -142,8 +146,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       }
       const adapter = agents.get(chosenType);
       if (adapter) {
-        const opts = item.todo.agentOptions?.byAgent?.[chosenType];
-        await adapter.run(item.todo, opts);
+        const opts = target.agentOptions?.byAgent?.[chosenType];
+        await adapter.run(target, opts);
       }
     }),
 

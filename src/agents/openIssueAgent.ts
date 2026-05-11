@@ -12,7 +12,7 @@ import { WorkspaceConfigStore } from '../config/workspaceConfig';
  */
 export class OpenIssueAgent implements AgentAdapter {
   readonly type = 'open-issue' as const;
-  readonly label = 'Open Issue (handoff to provider tooling)';
+  readonly label = 'Cloud';
 
   constructor(
     private todos: TodoStore,

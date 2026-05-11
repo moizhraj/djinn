@@ -32,8 +32,8 @@ export class AgentRegistry {
     _secrets: vscode.SecretStorage
   ) {
     this.adapters = [
-      new ClaudeCodeAgent(workspaceRoot, todos, metrics),
       new CopilotAgent(workspaceRoot, todos, metrics),
+      new ClaudeCodeAgent(workspaceRoot, todos, metrics),
       new OpenIssueAgent(todos, metrics, cfgStore)
     ];
   }

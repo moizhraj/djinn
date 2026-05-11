@@ -2,7 +2,7 @@
   "name": "djinn",
   "displayName": "Djinn",
   "description": "Capture todos in your repo and sync them to Azure DevOps, GitHub, or GitLab. Delegate work to Claude Code or Copilot agents.",
-  "version": "0.4.0",
+  "version": "0.4.12",
   "publisher": "moizmh",
   "engines": {
     "vscode": "^1.93.0"
@@ -27,13 +27,15 @@
     "views": {
       "djinn": [
         {
-          "id": "djinn.todoTree",
-          "name": "Todos"
+          "id": "djinn.todoEditor",
+          "name": "Djinn",
+          "type": "webview",
+          "visibility": "visible"
         }
       ]
     },
     "commands": [
-      { "command": "djinn.add", "title": "Djinn: Add Todo", "icon": "$(add)" },
+      { "command": "djinn.add", "title": "Djinn: New Todo", "icon": "$(add)" },
       { "command": "djinn.sync", "title": "Djinn: Sync", "icon": "$(cloud-upload)" },
       { "command": "djinn.refresh", "title": "Djinn: Refresh", "icon": "$(refresh)" },
       { "command": "djinn.edit", "title": "Edit", "icon": "$(edit)" },
@@ -44,14 +46,10 @@
     ],
     "menus": {
       "view/title": [
-        { "command": "djinn.add", "when": "view == djinn.todoTree", "group": "navigation@1" },
-        { "command": "djinn.sync", "when": "view == djinn.todoTree", "group": "navigation@2" },
-        { "command": "djinn.openMetrics", "when": "view == djinn.todoTree", "group": "navigation@3" },
-        { "command": "djinn.refresh", "when": "view == djinn.todoTree", "group": "navigation@4" }
-      ],
-      "view/item/context": [
-        { "command": "djinn.runAgent", "when": "view == djinn.todoTree && viewItem == todo", "group": "inline@1" },
-        { "command": "djinn.delete", "when": "view == djinn.todoTree && viewItem == todo", "group": "inline@2" }
+        { "command": "djinn.add", "when": "view == djinn.todoEditor", "group": "navigation@1" },
+        { "command": "djinn.sync", "when": "view == djinn.todoEditor", "group": "navigation@2" },
+        { "command": "djinn.openMetrics", "when": "view == djinn.todoEditor", "group": "navigation@3" },
+        { "command": "djinn.refresh", "when": "view == djinn.todoEditor", "group": "navigation@4" }
       ]
     },
     "configuration": {
@@ -59,9 +57,9 @@
       "properties": {
         "djinn.defaultAgent": {
           "type": "string",
-          "enum": ["claude-code", "copilot", "open-issue"],
-          "default": "claude-code",
-          "description": "Default agent to run when 'Run with Agent' has no explicit choice."
+          "enum": ["copilot", "claude-code", "open-issue"],
+          "default": "copilot",
+          "description": "Default provider to run when 'Run with Agent' has no explicit choice."
         },
         "djinn.claudeCodeCommand": {
           "type": "string",
@@ -70,8 +68,8 @@
         },
         "djinn.claudeCode.model": {
           "type": "string",
-          "enum": ["sonnet", "opus", "haiku"],
-          "default": "sonnet",
+          "enum": ["auto", "claude-sonnet-4-6", "claude-opus-4-7", "claude-haiku-4-5"],
+          "default": "auto",
           "description": "Default model for Claude Code agent runs."
         },
         "djinn.claudeCode.reasoning": {
@@ -88,7 +86,7 @@
         },
         "djinn.copilot.mode": {
           "type": "string",
-          "enum": ["agent", "edit", "ask"],
+          "enum": ["agent", "ask", "plan"],
           "default": "agent",
           "description": "Default Copilot Chat mode slash-command."
         },
@@ -96,6 +94,12 @@
           "type": "string",
           "default": "",
           "description": "Optional model hint included in the Copilot prompt."
+        },
+        "djinn.copilot.approvals": {
+          "type": "string",
+          "enum": ["default", "bypass", "autopilot"],
+          "default": "default",
+          "description": "Default approvals mode for Copilot tool calls."
         }
       }
     }
@@ -104,6 +108,7 @@
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
+    "preview": "node scripts/preview-server.mjs",
     "package": "vsce package"
   },
   "dependencies": {

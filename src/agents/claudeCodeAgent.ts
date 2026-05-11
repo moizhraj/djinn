@@ -10,6 +10,7 @@ import { markTodoCompleted } from '../store/completion';
 import { ensureDjinnStopHook, sentinelUri } from '../util/claudeStopHook';
 
 const MODEL_CHOICES = [
+  { value: 'auto', label: 'Auto' },
   { value: 'claude-sonnet-4-6', label: 'Claude Sonnet 4.6' },
   { value: 'claude-opus-4-7', label: 'Claude Opus 4.7' },
   { value: 'claude-haiku-4-5', label: 'Claude Haiku 4.5' }
@@ -31,7 +32,7 @@ const APPROVAL_CHOICES = [
 
 export class ClaudeCodeAgent implements AgentAdapter {
   readonly type = 'claude-code' as const;
-  readonly label = 'Claude Code (local CLI)';
+  readonly label = 'Claude';
 
   constructor(
     private workspaceRoot: vscode.Uri,
@@ -55,7 +56,7 @@ export class ClaudeCodeAgent implements AgentAdapter {
         label: 'Model',
         type: 'select',
         choices: MODEL_CHOICES,
-        default: cfg.get<string>('claudeCode.model', 'claude-sonnet-4-6')
+        default: cfg.get<string>('claudeCode.model', 'auto')
       },
       {
         key: 'reasoning',
@@ -80,9 +81,17 @@ export class ClaudeCodeAgent implements AgentAdapter {
 
     const ctx = await buildWorkspaceContext(this.workspaceRoot);
     const reasoningPrefix = reasoningHint(opts.reasoning);
+    // If the user picked a sub-agent in the form, route the prompt to that
+    // subagent. Claude Code's convention is to ask the agent by name; the
+    // CLI's planner will dispatch to the matching `.claude/agents/<name>.md`
+    // when the request explicitly mentions it.
+    const subAgentLine = opts.subAgent
+      ? `Use the ${opts.subAgent} subagent for this task.`
+      : '';
     const prompt = [
       ctx,
       '',
+      subAgentLine,
       `Task: ${todo.title}`,
       todo.description ? `Details: ${todo.description}` : '',
       reasoningPrefix
@@ -90,7 +99,9 @@ export class ClaudeCodeAgent implements AgentAdapter {
 
     const escaped = prompt.replace(/"/g, '\\"');
     const flags: string[] = [];
-    if (opts.model) flags.push(`--model ${opts.model}`);
+    // 'auto' is the form default — let Claude pick the model rather than
+    // pinning a specific one.
+    if (opts.model && opts.model !== 'auto') flags.push(`--model ${opts.model}`);
     if (opts.approvals && opts.approvals !== 'default') flags.push(`--permission-mode ${opts.approvals}`);
     const command = `${cmd} ${flags.join(' ')} "${escaped}"`.replace(/\s+/g, ' ');
 
@@ -142,8 +153,16 @@ export class ClaudeCodeAgent implements AgentAdapter {
 
   private resolveOptions(options?: Record<string, string>): Record<string, string> {
     const out: Record<string, string> = {};
+    // Apply schema defaults first.
     for (const f of this.optionsSchema()) {
       out[f.key] = (options?.[f.key] ?? f.default ?? '').trim();
+    }
+    // Then pass through any extra keys not in the schema (e.g. `subAgent`,
+    // which is rendered by a custom chip rather than a schema field).
+    if (options) {
+      for (const [k, v] of Object.entries(options)) {
+        if (!(k in out) && typeof v === 'string') out[k] = v.trim();
+      }
     }
     return out;
   }
